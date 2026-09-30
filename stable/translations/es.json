@@ -1,0 +1,27 @@
+{
+  "configuration": {
+    "public_url": {
+      "name": "Dirección HTTPS",
+      "description": "Usa un dominio que controles. No lo cambies después de crear tu cuenta: las claves de acceso dependen de él."
+    },
+    "certificate": {
+      "name": "Archivo del certificado",
+      "description": "En la configuración de esta aplicación introduce fullchain.pem como certificado y privkey.pem como clave privada. Usa tu dominio HTTPS con el puerto 8448 para Stable o 8449 para Main, o tu puerto de host personalizado. /ssl permanece de solo lectura. No es necesario modificar HTTPS de Home Assistant Core."
+    },
+    "private_key": {
+      "name": "Archivo de clave privada",
+      "description": "En la configuración de esta aplicación introduce fullchain.pem como certificado y privkey.pem como clave privada. Usa tu dominio HTTPS con el puerto 8448 para Stable o 8449 para Main, o tu puerto de host personalizado. /ssl permanece de solo lectura. No es necesario modificar HTTPS de Home Assistant Core."
+    },
+    "gateway_auth": {
+      "name": "Código adicional de acceso a la pasarela",
+      "description": "Guarda la configuración y reinicia esta aplicación. Abre la dirección HTTPS en otra pestaña sin advertencias de certificado. Crea tu cuenta y clave de acceso en Nocturne y prueba otro dispositivo."
+    },
+    "language": {
+      "name": "Idioma",
+      "description": "Te ayudamos a poner Nocturne en marcha paso a paso."
+    }
+  },
+  "network": {
+    "8448/TCP": "Dirección HTTPS"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "configuration": {
+    "public_url": {
+      "name": "HTTPS-adres",
+      "description": "Gebruik een domeinnaam die je beheert. Houd die na accountaanmaak gelijk: je passkeys zijn eraan gekoppeld."
+    },
+    "certificate": {
+      "name": "Certificaatbestand",
+      "description": "Vul bij Configuratie van deze app fullchain.pem in als certificaat en privkey.pem als privésleutel. Vul je HTTPS-domein in met poort 8448 voor Stable of 8449 voor Main. Gebruik bij een aangepaste hostpoort die poort. /ssl blijft alleen-lezen. Je hoeft HTTPS van Home Assistant Core hiervoor niet aan te passen."
+    },
+    "private_key": {
+      "name": "Bestand met privésleutel",
+      "description": "Vul bij Configuratie van deze app fullchain.pem in als certificaat en privkey.pem als privésleutel. Vul je HTTPS-domein in met poort 8448 voor Stable of 8449 voor Main. Gebruik bij een aangepaste hostpoort die poort. /ssl blijft alleen-lezen. Je hoeft HTTPS van Home Assistant Core hiervoor niet aan te passen."
+    },
+    "gateway_auth": {
+      "name": "Extra toegangscode voor de gateway",
+      "description": "Herstart deze app nadat je de instellingen hebt opgeslagen. Open je HTTPS-adres in een nieuw tabblad. De browser mag geen certificaatwaarschuwing tonen. Maak je account/passkey in Nocturne aan en test een tweede apparaat."
+    },
+    "language": {
+      "name": "Taal",
+      "description": "We helpen je stap voor stap om Nocturne werkend te krijgen."
+    }
+  },
+  "network": {
+    "8448/TCP": "HTTPS-adres"
+  }
+}

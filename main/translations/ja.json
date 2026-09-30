@@ -1,0 +1,27 @@
+{
+  "configuration": {
+    "public_url": {
+      "name": "HTTPS アドレス",
+      "description": "自分で管理するドメイン名を使います。アカウント作成後は変更しないでください。パスキーはそのドメインに紐づきます。"
+    },
+    "certificate": {
+      "name": "証明書ファイル",
+      "description": "このアプリの設定で証明書に fullchain.pem、秘密鍵に privkey.pem を入力します。HTTPS ドメインのポートは Stable が 8448、Main が 8449 です。変更済みの場合は設定したホストポートを使います。/ssl は読み取り専用です。Home Assistant Core の HTTPS 設定は変更不要です。"
+    },
+    "private_key": {
+      "name": "秘密鍵ファイル",
+      "description": "このアプリの設定で証明書に fullchain.pem、秘密鍵に privkey.pem を入力します。HTTPS ドメインのポートは Stable が 8448、Main が 8449 です。変更済みの場合は設定したホストポートを使います。/ssl は読み取り専用です。Home Assistant Core の HTTPS 設定は変更不要です。"
+    },
+    "gateway_auth": {
+      "name": "ゲートウェイの追加アクセスコード",
+      "description": "設定を保存してこのアプリを再起動します。新しいタブで HTTPS アドレスを開き、証明書警告が出ないことを確認します。Nocturne のアカウントとパスキーを設定し、別の端末でも試します。"
+    },
+    "language": {
+      "name": "言語",
+      "description": "Nocturne を使えるように、手順に沿ってお手伝いします。"
+    }
+  },
+  "network": {
+    "8448/TCP": "HTTPS アドレス"
+  }
+}

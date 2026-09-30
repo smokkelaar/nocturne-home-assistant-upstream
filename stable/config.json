@@ -1,0 +1,48 @@
+{
+  "arch": [
+    "amd64"
+  ],
+  "startup": "application",
+  "boot": "manual",
+  "init": false,
+  "timeout": 120,
+  "ingress": true,
+  "ingress_port": 8099,
+  "panel_icon": "mdi:heart-pulse",
+  "panel_title": "Nocturne Stable",
+  "panel_admin": true,
+  "ports": {
+    "8448/tcp": 8448
+  },
+  "ports_description": {
+    "8448/tcp": "Nocturne HTTPS"
+  },
+  "map": [
+    {
+      "type": "ssl",
+      "read_only": true
+    }
+  ],
+  "backup": "cold",
+  "options": {
+    "public_url": "https://homeassistant.local:8448",
+    "certificate": "",
+    "private_key": "",
+    "gateway_auth": true,
+    "language": "auto"
+  },
+  "schema": {
+    "public_url": "url",
+    "certificate": "str",
+    "private_key": "str",
+    "gateway_auth": "bool",
+    "language": "list(auto|en|es|fr|de|it|pt|nl|ru|zh|ja|ko)"
+  },
+  "stage": "experimental",
+  "name": "Nocturne Stable",
+  "version": "0.2.0-201",
+  "slug": "nocturne_local",
+  "description": "Nocturne 0.2.7 · setup assistant",
+  "url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream",
+  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}"
+}

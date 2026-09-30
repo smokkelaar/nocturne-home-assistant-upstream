@@ -1,0 +1,27 @@
+{
+  "configuration": {
+    "public_url": {
+      "name": "HTTPS 地址",
+      "description": "使用你管理的域名。创建账户后请保持域名不变：通行密钥依赖该域名。"
+    },
+    "certificate": {
+      "name": "证书文件",
+      "description": "在此应用的配置中，证书填写 fullchain.pem，私钥填写 privkey.pem。HTTPS 域名的端口为 Stable 的 8448 或 Main 的 8449；如已修改主机端口，请使用该端口。/ssl 保持只读。无需修改 Home Assistant Core 的 HTTPS 设置。"
+    },
+    "private_key": {
+      "name": "私钥文件",
+      "description": "在此应用的配置中，证书填写 fullchain.pem，私钥填写 privkey.pem。HTTPS 域名的端口为 Stable 的 8448 或 Main 的 8449；如已修改主机端口，请使用该端口。/ssl 保持只读。无需修改 Home Assistant Core 的 HTTPS 设置。"
+    },
+    "gateway_auth": {
+      "name": "网关额外访问码",
+      "description": "保存配置并重启此应用。在新标签页打开 HTTPS 地址，浏览器不应显示证书警告。完成 Nocturne 账户和通行密钥设置，并测试第二台设备。"
+    },
+    "language": {
+      "name": "语言",
+      "description": "我们将逐步帮助你运行 Nocturne。"
+    }
+  },
+  "network": {
+    "8448/TCP": "HTTPS 地址"
+  }
+}
