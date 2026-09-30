@@ -1,6 +1,6 @@
 # Nocturne Stable
 
-Package 0.2.602; Nocturne source d9e1430975c7a05967cba66374392f75f08c858f.
+Package 0.2.701; Nocturne source d9e1430975c7a05967cba66374392f75f08c858f.
 
 Open the Home Assistant web interface for multilingual setup help.
 
