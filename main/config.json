@@ -29,7 +29,7 @@
     "certificate": "",
     "private_key": "",
     "gateway_auth": true,
-    "language": "auto"
+    "language": "en"
   },
   "schema": {
     "public_url": "url",
@@ -40,7 +40,7 @@
   },
   "stage": "experimental",
   "name": "Nocturne Main",
-  "version": "0.2.0-401",
+  "version": "0.2.501",
   "slug": "nocturne_latest",
   "description": "Nocturne main-f9c1f88 · setup assistant",
   "url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream",
