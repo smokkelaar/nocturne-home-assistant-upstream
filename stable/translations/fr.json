@@ -16,6 +16,10 @@
       "name": "Code d'accès supplémentaire à la passerelle",
       "description": "Enregistrez les paramètres et redémarrez cette application. Ouvrez l'adresse HTTPS dans un nouvel onglet sans avertissement de certificat. Créez votre compte et clé d'accès dans Nocturne et testez un second appareil."
     },
+    "skip_gateway_check": {
+      "name": "Ignorer volontairement le contrôle",
+      "description": "Uniquement avec gateway_auth désactivé. Ignore le contrôle du wrapper pour un accès anonyme voulu ; Nocturne détermine toujours les droits d’accès et de partage. Désactivé par défaut. Enregistrez et redémarrez."
+    },
     "language": {
       "name": "Langue",
       "description": "Nous vous aidons à faire fonctionner Nocturne, étape par étape."

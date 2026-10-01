@@ -16,6 +16,10 @@
       "name": "Extra gateway access code",
       "description": "Restart this app after saving the settings. Open your HTTPS address in a new tab. The browser must show no certificate warning. Complete Nocturne's account/passkey setup and test a second device."
     },
+    "skip_gateway_check": {
+      "name": "Deliberately skip gateway check",
+      "description": "Only with gateway_auth off. Skip the wrapper authentication check for intentional anonymous access; Nocturne access/share settings still decide permissions. Default off. Save and restart."
+    },
     "language": {
       "name": "Language",
       "description": "We will help you get Nocturne working, one step at a time."

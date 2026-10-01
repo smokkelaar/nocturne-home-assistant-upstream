@@ -16,6 +16,10 @@
       "name": "Código adicional de acesso ao gateway",
       "description": "Guarde as definições e reinicie esta aplicação. Abra o endereço HTTPS num novo separador sem avisos de certificado. Crie conta e chave de acesso no Nocturne e teste outro dispositivo."
     },
+    "skip_gateway_check": {
+      "name": "Ignorar deliberadamente a verificação",
+      "description": "Apenas com gateway_auth desativado. Ignora a verificação do wrapper para acesso anónimo intencional; Nocturne continua a determinar permissões de acesso e partilha. Desativado por predefinição. Guarda e reinicia."
+    },
     "language": {
       "name": "Idioma",
       "description": "Ajudamos a colocar o Nocturne em funcionamento, passo a passo."

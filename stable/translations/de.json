@@ -16,6 +16,10 @@
       "name": "Zusätzlicher Gateway-Zugangscode",
       "description": "Speichern Sie die Einstellungen und starten Sie diese App neu. Öffnen Sie die HTTPS-Adresse in einem neuen Tab ohne Zertifikatswarnung. Richten Sie Konto und Passkey in Nocturne ein und testen Sie ein zweites Gerät."
     },
+    "skip_gateway_check": {
+      "name": "Gatewayprüfung bewusst überspringen",
+      "description": "Nur bei ausgeschaltetem gateway_auth. Wrapperprüfung für gewünschten anonymen Zugriff überspringen; Nocturne-Zugriffs-/Freigabeeinstellungen bestimmen weiterhin die Rechte. Standard: aus. Speichern und neu starten."
+    },
     "language": {
       "name": "Sprache",
       "description": "Wir helfen Ihnen Schritt für Schritt, Nocturne einzurichten."

@@ -16,6 +16,10 @@
       "name": "Codice aggiuntivo di accesso al gateway",
       "description": "Salva le impostazioni e riavvia questa app. Apri l'indirizzo HTTPS in una nuova scheda senza avvisi sul certificato. Crea account e passkey in Nocturne e prova un secondo dispositivo."
     },
+    "skip_gateway_check": {
+      "name": "Salta intenzionalmente il controllo",
+      "description": "Solo con gateway_auth disattivato. Salta il controllo del wrapper per accesso anonimo intenzionale; Nocturne determina ancora i permessi di accesso e condivisione. Disattivato per impostazione predefinita. Salva e riavvia."
+    },
     "language": {
       "name": "Lingua",
       "description": "Ti aiutiamo a far funzionare Nocturne, passo dopo passo."

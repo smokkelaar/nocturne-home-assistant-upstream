@@ -16,6 +16,10 @@
       "name": "Extra toegangscode voor de gateway",
       "description": "Herstart deze app nadat je de instellingen hebt opgeslagen. Open je HTTPS-adres in een nieuw tabblad. De browser mag geen certificaatwaarschuwing tonen. Maak je account/passkey in Nocturne aan en test een tweede apparaat."
     },
+    "skip_gateway_check": {
+      "name": "Gatewaycontrole bewust overslaan",
+      "description": "Alleen met gateway_auth uit. Sla de wrappercontrole over voor bewust anonieme toegang; Nocturne-toegangs/deelinstellingen bepalen nog steeds de rechten. Standaard uit. Opslaan en herstarten."
+    },
     "language": {
       "name": "Taal",
       "description": "We helpen je stap voor stap om Nocturne werkend te krijgen."

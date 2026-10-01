@@ -16,6 +16,10 @@
       "name": "Código adicional de acceso a la pasarela",
       "description": "Guarda la configuración y reinicia esta aplicación. Abre la dirección HTTPS en otra pestaña sin advertencias de certificado. Crea tu cuenta y clave de acceso en Nocturne y prueba otro dispositivo."
     },
+    "skip_gateway_check": {
+      "name": "Omitir deliberadamente la comprobación",
+      "description": "Solo con gateway_auth desactivado. Omite la comprobación del wrapper para acceso anónimo intencionado; Nocturne decide los permisos de acceso y compartición. Desactivado por defecto. Guarda y reinicia."
+    },
     "language": {
       "name": "Idioma",
       "description": "Te ayudamos a poner Nocturne en marcha paso a paso."

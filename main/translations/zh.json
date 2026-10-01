@@ -16,6 +16,10 @@
       "name": "网关额外访问码",
       "description": "保存配置并重启此应用。在新标签页打开 HTTPS 地址，浏览器不应显示证书警告。完成 Nocturne 账户和通行密钥设置，并测试第二台设备。"
     },
+    "skip_gateway_check": {
+      "name": "主动跳过网关检查",
+      "description": "仅在 gateway_auth 关闭时有效。为有意开放的匿名访问跳过包装层检查；Nocturne 的访问和共享设置仍决定权限。默认关闭。保存后重启。"
+    },
     "language": {
       "name": "语言",
       "description": "我们将逐步帮助你运行 Nocturne。"
