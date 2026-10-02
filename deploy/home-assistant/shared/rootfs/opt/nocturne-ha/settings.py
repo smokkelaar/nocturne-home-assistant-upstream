@@ -79,8 +79,9 @@ def load_secrets(data_dir):
 
 
 def service_environments(options, passwords, timezone='Europe/Amsterdam'):
+    # Public URL construction needs the external port; host checks use hostname.
     common = {'PATH': '/usr/local/bin:/usr/bin:/bin', 'TZ': timezone,
-              'BASE_DOMAIN': options['hostname'], 'INSTANCE_KEY': passwords['instance'],
+              'BASE_DOMAIN': options['authority'], 'INSTANCE_KEY': passwords['instance'],
               'OTEL_EXPORTER_OTLP_ENDPOINT': '', 'OTEL_SDK_DISABLED': 'true'}
     api = dict(common, HOME='/home/app', DOTNET_ENVIRONMENT='Production',
                ASPNETCORE_ENVIRONMENT='Production', ASPNETCORE_URLS='http://127.0.0.1:8080',
