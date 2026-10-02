@@ -1,30 +1,30 @@
 {
   "channel": "main",
-  "commit": "82173eafb2b647067d0983ac393b24abb39a9453",
-  "upstream_tag": "main-82173ea",
-  "upstream_run": 36767977502,
+  "commit": "637eab713215dee122ed335ebafd154925c80aad",
+  "upstream_tag": "main-637eab7",
+  "upstream_run": 36935693260,
   "recipe": "fe6f7c72e3c0c5dac32ea59c28cbbc81ef5af64d68d5f700edf64c24369edce7",
-  "version": "0.2.1001",
-  "wrapper_commit": "7209e4872fd8c74fe78159f5d461dce1451137bb",
+  "version": "0.2.1301",
+  "wrapper_commit": "f6739827b648ce281e1b662f14ae524e17dada14",
   "repository": "smokkelaar/nocturne-home-assistant-upstream",
   "platforms": [
     "amd64"
   ],
   "links": {
-    "source_url": "https://github.com/nightscout/nocturne/tree/82173eafb2b647067d0983ac393b24abb39a9453",
+    "source_url": "https://github.com/nightscout/nocturne/tree/637eab713215dee122ed335ebafd154925c80aad",
     "release_url": null,
-    "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/7209e4872fd8c74fe78159f5d461dce1451137bb/deploy/home-assistant",
-    "build_url": "https://github.com/nightscout/nocturne/actions/runs/36767977502"
+    "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/f6739827b648ce281e1b662f14ae524e17dada14/deploy/home-assistant",
+    "build_url": "https://github.com/nightscout/nocturne/actions/runs/36935693260"
   },
-  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.701",
+  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.1001",
   "images": {
     "amd64": {
-      "api": "sha256:054f2b6f575e1b91ee8d3b7a1b2496ab289cb45e6fadc78c3ea81a3ebdf667e2",
+      "api": "sha256:60847753f25f67162b4b80239f647a33d94b6ad87d6e0dea15f9c4be382787eb",
       "web": "sha256:13b103b5b280a8ba5c7b28f9287a1b9c1dccdd34013af3ac3d95e01425a7ae14"
     }
   },
-  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.1001",
+  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.1301",
   "digests": {
-    "amd64": "sha256:25b5fe6b193f1ad21760612857caa5b2dc2e54feac089687c591c53e019ee825"
+    "amd64": "sha256:ede9281f7e3528d6f3b393b5ef8748022766dac15b41001923435bff89a221ba"
   }
 }
