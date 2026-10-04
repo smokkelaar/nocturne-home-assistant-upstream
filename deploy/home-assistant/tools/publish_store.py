@@ -48,13 +48,27 @@ def publish(candidate, destination):
             'language': {'name': text['language'], 'description': text['intro']},
         }, 'network': {'8448/TCP': text['address_label']}}
         write(folder / 'translations' / path.name, translated)
-    for filename in ('README.md', 'DOCS.md', 'CHANGELOG.md'):
+    for filename in ('README.md', 'DOCS.md'):
         (folder / filename).write_text(
             f'# Nocturne {channel.title()}\n\n'
             f'Package {version}; Nocturne source {provenance["commit"]}.\n\n'
             f'Open the Home Assistant web interface for multilingual setup help.\n\n'
             f'[Setup guide](https://github.com/{repo}/blob/main/docs/SETUP.en.md) · '
             f'[Source]({provenance["links"]["source_url"]})\n', encoding='utf-8')
+    change_link = provenance['links']['release_url']
+    changes = (f'[Nocturne release notes]({change_link})' if change_link else
+               f'Main is a source snapshot. [Nocturne commit history](https://github.com/nightscout/nocturne/commits/{provenance["commit"]}/)')
+    (folder / 'CHANGELOG.md').write_text(
+        f'# Nocturne {channel.title()} — HA package {version}\n\n'
+        f'Nocturne version/source: `{provenance["upstream_tag"]}`.\n\n'
+        f'Published architectures: {", ".join(digests)}. Both use the same Nocturne source.\n\n'
+        f'{changes}\n\n'
+        f'- [Exact Nocturne source]({provenance["links"]["source_url"]})\n'
+        f'- [HA wrapper source]({provenance["links"]["wrapper_url"]})\n'
+        f'- [Upstream image build]({provenance["links"]["build_url"]})\n'
+        f'- [Package provenance and image digests](provenance.json)\n\n'
+        'HA package and Nocturne version numbers are separate. Publication requires native '
+        'runtime, setup and recovery tests and anonymous registry verification.\n', encoding='utf-8')
     (destination / 'repository.yaml').write_text(
         'name: Nocturne Home Assistant (experimental)\nurl: https://github.com/' + repo
         + '\nmaintainer: ' + repo.split('/')[0] + '\n', encoding='utf-8')

@@ -50,7 +50,8 @@ missing certificates keep the helper available, and performs cold restore plus a
 from the previous published image. On the first publication, same-version restore is
 tested; that is not evidence of a historical upgrade. The tested image is pushed as-is.
 Promotion verifies anonymous pulls and HA version/architecture labels before writing
-store config. The first pilot publishes AMD64; optional ARM64 builds use native runners.
+store config. Stable and Main publish both AMD64 and ARM64 using native runners.
+Upstream update checks run hourly; unchanged candidates do not trigger a rebuild.
 
 Images use `ghcr.io/<owner>/<repository>/nocturne-<channel>-<ha-arch>:<version>`.
 HA uses `{arch}` in the image path. Main and Stable share the runtime source but not data.

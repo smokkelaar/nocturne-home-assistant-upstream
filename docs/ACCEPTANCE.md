@@ -17,7 +17,8 @@
 - [ ] Cold backup/restore includes secrets and account/passkey state. Old image plus
       upgraded database is not presented as a valid downgrade strategy.
 - [ ] AMD64 → ARM64 database migration is rehearsed before promising portability.
-- [ ] The ARM64 runtime passes native CI and real HAOS checks before advertising aarch64.
+- [x] AMD64 and ARM64 pass native runtime/setup/recovery CI and anonymous image verification.
+- [ ] Complete ARM64 installation and upgrade acceptance on real HAOS hardware.
 - [ ] Registry visibility, unavailable downloads, partial publication and safe retries
       have been rehearsed. Dependency rebuilds create fresh package versions.
 - [ ] Upstream maintainers accept placement, language tooling, public repository identity,

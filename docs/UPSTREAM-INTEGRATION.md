@@ -53,7 +53,7 @@ Real Supervisor discovery on the minimum supported version must still be tested.
 
 ## Workflows
 
-The pilot polls every six hours and follows upstream's paired publisher jobs. For upstream
+The pilot polls every hour and follows upstream's paired publisher jobs. For upstream
 acceptance, convert candidate selection into a reusable `workflow_call` with exact API/web
 digests, source SHA, source ref and event type as inputs. Call it only after the
 `dotnet-images`, `web-image` and `report` jobs succeed in `docker-publish.yml`.
@@ -101,10 +101,10 @@ review of all instructions remains a release acceptance task.
    and minimum HA/Supervisor versions.
 2. Add help, language-source integration, correct source/release/wrapper/build links,
    detailed setup docs and newcomer usability tests.
-3. Add prebuilt AMD64 image publication and the distribution branch; demonstrate ten
+3. Retain prebuilt AMD64/ARM64 image publication and the distribution branch; demonstrate ten
    HAOS upgrades without new local buildcache.
-4. Validate ARM64 on native runners and real HAOS hardware; only then widen supported
-   architectures. Validate backup portability separately.
+4. Retain native ARM64 CI validation and complete real HAOS hardware acceptance.
+   Validate backup portability separately before promising cross-architecture migration.
 5. Connect successful upstream publisher jobs and enable automatic promotion according
    to upstream's policy. Publish the accepted install link in upstream docs.
 
