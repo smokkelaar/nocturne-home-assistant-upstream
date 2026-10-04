@@ -1,30 +1,30 @@
 {
   "channel": "main",
-  "commit": "d21c2fb81e974fa957fb0b072047fe7a70ae711a",
-  "upstream_tag": "main-d21c2fb",
-  "upstream_run": 37127989307,
+  "commit": "01b955be7376163461663477bd62aeeb2ee919e6",
+  "upstream_tag": "main-01b955b",
+  "upstream_run": 37168886398,
   "recipe": "b6b3399b329e2121219f4f214696f38a50574d29ba0913befbe8f21d45c7ca9a",
-  "version": "0.2.2001",
+  "version": "0.2.2301",
   "wrapper_commit": "f5cd280f9fdc7f4523b3b6f60eb333a9399b1b6d",
   "repository": "smokkelaar/nocturne-home-assistant-upstream",
   "platforms": [
     "amd64"
   ],
   "links": {
-    "source_url": "https://github.com/nightscout/nocturne/tree/d21c2fb81e974fa957fb0b072047fe7a70ae711a",
+    "source_url": "https://github.com/nightscout/nocturne/tree/01b955be7376163461663477bd62aeeb2ee919e6",
     "release_url": null,
     "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/f5cd280f9fdc7f4523b3b6f60eb333a9399b1b6d/deploy/home-assistant",
-    "build_url": "https://github.com/nightscout/nocturne/actions/runs/37127989307"
+    "build_url": "https://github.com/nightscout/nocturne/actions/runs/37168886398"
   },
-  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.1701",
+  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.2001",
   "images": {
     "amd64": {
-      "api": "sha256:3f200f62c0324093364bcaafb64c0e64a021442ddb696d7a615fee1cff1f2742",
-      "web": "sha256:d7f2fa2f9de2cbeb6bbdb82f12f2397e347aa590c90a7b3e75ed7b9f17b3c833"
+      "api": "sha256:e217bbbea4dec4864c0a99242213f66d762629cb787c6c124fd20cfe4885ade2",
+      "web": "sha256:0644fa502c68b6001e8994b074ba7fab56377a7ab8f64470618168201119bcca"
     }
   },
-  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.2001",
+  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.2301",
   "digests": {
-    "amd64": "sha256:f427abfa039e695fb34b17612bc47a8e6fbb8638d0f6bb589c3f995a51f7c5ae"
+    "amd64": "sha256:47eae14458e0c052d7ed2766d9b2d1d3746b5b004af5752a089e3ecbb6801786"
   }
 }
