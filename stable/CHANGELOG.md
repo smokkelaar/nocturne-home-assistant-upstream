@@ -1,7 +1,14 @@
-# Nocturne Stable
+# Nocturne Stable — HA package 0.2.2701
 
-Package 0.2.2601; Nocturne source d9e1430975c7a05967cba66374392f75f08c858f.
+Nocturne version/source: `0.2.7`.
 
-Open the Home Assistant web interface for multilingual setup help.
+Published architectures: amd64, aarch64. Both use the same Nocturne source.
 
-[Setup guide](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/main/docs/SETUP.en.md) · [Source](https://github.com/nightscout/nocturne/tree/d9e1430975c7a05967cba66374392f75f08c858f)
+[Nocturne release notes](https://github.com/nightscout/nocturne/releases/tag/v0.2.7)
+
+- [Exact Nocturne source](https://github.com/nightscout/nocturne/tree/d9e1430975c7a05967cba66374392f75f08c858f)
+- [HA wrapper source](https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/ef7ac641e283ea22690b7f2cc846386e471faaf6/deploy/home-assistant)
+- [Upstream image build](https://github.com/nightscout/nocturne/actions/runs/34594063064)
+- [Package provenance and image digests](provenance.json)
+
+HA package and Nocturne version numbers are separate. Publication requires native runtime, setup and recovery tests and anonymous registry verification.

@@ -1,6 +1,6 @@
 # Nocturne Main
 
-Package 0.2.2601; Nocturne source 019822557fefb002ef79ccc601d4a72713fa971b.
+Package 0.2.2701; Nocturne source 019822557fefb002ef79ccc601d4a72713fa971b.
 
 Open the Home Assistant web interface for multilingual setup help.
 
