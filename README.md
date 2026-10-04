@@ -4,6 +4,12 @@
 
 [![Wrapper checks](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-validate.yml/badge.svg)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-validate.yml)
 [![Publish Stable and Main](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-publish.yml/badge.svg)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-publish.yml)
+[![Main branch checks](https://img.shields.io/github/checks-status/smokkelaar/nocturne-home-assistant-upstream/main?label=Main%20branch%20checks)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/commits/main/)
+
+[![Stable HA package](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fstable%2Fconfig.json&query=%24.version&label=Stable%20HA%20package&color=blue)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/config.json)
+[![Stable Nocturne](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fstable%2Fprovenance.json&query=%24.upstream_tag&label=Stable%20Nocturne&color=blue)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/provenance.json)
+[![Main HA package](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fmain%2Fconfig.json&query=%24.version&label=Main%20HA%20package&color=orange)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/config.json)
+[![Main Nocturne snapshot](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fmain%2Fprovenance.json&query=%24.upstream_tag&label=Main%20Nocturne&color=orange)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/provenance.json)
 
 Stable and Main, prebuilt in GitHub Actions, with a multilingual setup assistant.
 This clean repository contains the complete existing HA runtime, redesigned help,
@@ -15,6 +21,64 @@ The runtime derives from smokkelaar/nocturne-home-assistant at
 after container tests and anonymous registry verification pass. A build failure keeps
 the previously published store version. Real HAOS upgrades and passkey/browser checks
 remain part of the user test plan.
+
+Development experiments and smokkelaar's personal test builds live in
+[nocturne-home-assistant](https://github.com/smokkelaar/nocturne-home-assistant).
+Suitable changes are carried over here after testing; experimental Personal and
+Test A/B/C builds are not automatically included in Stable or Main.
+
+## At a glance
+
+The version badges read the **published `home-assistant` branch**, so they update
+after a successful publication without editing this README. HA package versions
+and Nocturne versions are separate; Main identifies an exact source snapshot.
+GitHub/Shields caching can briefly delay badge updates. The linked metadata is the
+source of truth.
+
+| Item | Stable | Main |
+| --- | --- | --- |
+| Nocturne source | Published Nocturne release | Tested snapshot of Nocturne `main` |
+| Published version, source SHA and image digests | [Stable metadata](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/provenance.json) | [Main metadata](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/provenance.json) |
+| Installation | Prebuilt container | Prebuilt container |
+| Supported architecture | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/config.json) (`amd64` currently) | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/config.json) (`amd64` currently) |
+| Default HTTPS port | 8448 | 8449 |
+| Update checks | Every six hours | Every six hours |
+| Setup languages | Eleven; English by default | Eleven; English by default |
+
+### Checks before publication
+
+The workflow badges above show actual GitHub Actions results; **Main branch
+checks** summarizes the check runs on the current maintained-source commit.
+A green **Wrapper
+checks** badge covers the automated wrapper regression suite. **Publish Stable
+and Main** runs candidate validation and, for changed channels, container startup,
+setup and previous-version recovery tests before publishing. Promotion verifies
+anonymous image pulls, HA image labels and increasing package versions. An
+unchanged-channel run can succeed without publishing a new version; a failed run
+leaves the last published version available. Open the workflow for individual
+check results.
+
+### Home Assistant security and access
+
+Both channels use the same [app configuration](deploy/home-assistant/shared/app-spec.json).
+
+| Property | Configuration |
+| --- | --- |
+| HA security rating | **Expected 6/6** with the default configuration; verify the actual rating in your HA app information page |
+| Ingress | Enabled for the HA setup/status interface; Nocturne opens separately over HTTPS |
+| AppArmor | Home Assistant's default profile enabled; no custom profile is shipped |
+| Protection mode | No unprotected-only permissions are requested; keep protection mode enabled |
+| Host access | No host network/PID access, Docker API or privileged capabilities requested |
+| Home Assistant APIs | No Supervisor API or Home Assistant Core API access requested |
+| Certificates | `/ssl` is mounted read-only |
+| Backups | Cold backups; restore behavior is tested before publication |
+
+The expected rating follows [Home Assistant's documented rating rules](https://developers.home-assistant.io/docs/apps/presentation/#security):
+the base score is 5, ingress adds 2, and the score is capped at 6. This is a
+configuration-based expectation, not a measurement from a user's installation or
+a security audit. The actual rating and protection/AppArmor state are shown by
+Supervisor and can depend on local settings. Real HAOS and live-provider checks
+remain in the [acceptance checklist](docs/ACCEPTANCE.md).
 
 ## Install
 
