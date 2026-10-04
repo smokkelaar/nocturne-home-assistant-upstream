@@ -3,28 +3,34 @@
   "commit": "d9e1430975c7a05967cba66374392f75f08c858f",
   "upstream_tag": "0.2.7",
   "upstream_run": 34594063064,
-  "recipe": "b6b3399b329e2121219f4f214696f38a50574d29ba0913befbe8f21d45c7ca9a",
-  "version": "0.2.1701",
-  "wrapper_commit": "f5cd280f9fdc7f4523b3b6f60eb333a9399b1b6d",
+  "recipe": "6b21763c545cac40b05cb46f9bb42991d819b6b3837190eddf4c74f80bc02a0e",
+  "version": "0.2.2601",
+  "wrapper_commit": "d69687195a8f48d987db2236a9da9ef476a9bc2d",
   "repository": "smokkelaar/nocturne-home-assistant-upstream",
   "platforms": [
-    "amd64"
+    "amd64",
+    "arm64"
   ],
   "links": {
     "source_url": "https://github.com/nightscout/nocturne/tree/d9e1430975c7a05967cba66374392f75f08c858f",
     "release_url": "https://github.com/nightscout/nocturne/releases/tag/v0.2.7",
-    "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/f5cd280f9fdc7f4523b3b6f60eb333a9399b1b6d/deploy/home-assistant",
+    "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/d69687195a8f48d987db2236a9da9ef476a9bc2d/deploy/home-assistant",
     "build_url": "https://github.com/nightscout/nocturne/actions/runs/34594063064"
   },
-  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}:0.2.1001",
+  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}:0.2.1701",
   "images": {
     "amd64": {
       "api": "sha256:507f3497203703382f204b1833ab4e6ac5540906042705b676b7a2984a95c6b9",
       "web": "sha256:5ec638cdefb06d56fc4d25c680772778e6d1defc0c6dc4e9993443b9f5dcd2f5"
+    },
+    "arm64": {
+      "api": "sha256:0f82833b24b440fae3153fec0b34386fcaafd57a31b855354d058dde5d326992",
+      "web": "sha256:3fc19100a29984ae9f22a233324c1f4a4b05f07ea35346a7e2c56a0b6998e000"
     }
   },
-  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}:0.2.1701",
+  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}:0.2.2601",
   "digests": {
-    "amd64": "sha256:e69681c9de019ae268be1772bf7f62fa3278849a834662d886196a4aaf528b0b"
+    "amd64": "sha256:f1fff621f5a08417d988ac2ca84bf8b2feefdce9bd480429c66f77c957575a37",
+    "aarch64": "sha256:096c0bd58ff2e9d2fa1cadace00c8d923b3ba620ab732eeda723499f223f1aa7"
   }
 }
