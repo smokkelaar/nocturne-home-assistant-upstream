@@ -4,7 +4,7 @@
 
 [![Wrapper checks](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-validate.yml/badge.svg)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-validate.yml)
 [![Publish Stable and Main](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-publish.yml/badge.svg)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/actions/workflows/ha-publish.yml)
-[![Main branch checks](https://img.shields.io/github/checks-status/smokkelaar/nocturne-home-assistant-upstream/main?label=Main%20branch%20checks)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/commits/main/)
+[![Main branch checks](https://img.shields.io/github/check-runs/smokkelaar/nocturne-home-assistant-upstream/main?label=Main%20branch%20checks)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/commits/main/)
 
 [![Stable HA package](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fstable%2Fconfig.json&query=%24.version&label=Stable%20HA%20package&color=blue)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/config.json)
 [![Stable Nocturne](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fstable%2Fprovenance.json&query=%24.upstream_tag&label=Stable%20Nocturne&color=blue)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/provenance.json)
