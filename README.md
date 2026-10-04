@@ -40,7 +40,7 @@ source of truth.
 | Nocturne source | Published Nocturne release | Tested snapshot of Nocturne `main` |
 | Published version, source SHA and image digests | [Stable metadata](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/provenance.json) | [Main metadata](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/provenance.json) |
 | Installation | Prebuilt container | Prebuilt container |
-| Supported architecture | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/config.json) (`amd64` currently) | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/config.json) (`amd64` currently) |
+| Supported architecture | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/config.json) | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/config.json) |
 | Default HTTPS port | 8448 | 8449 |
 | Update checks | Every six hours | Every six hours |
 | Setup languages | Eleven; English by default | Eleven; English by default |
@@ -125,10 +125,12 @@ Choose `auto` explicitly to follow the browser language, or select another langu
 in HA configuration. Existing settings are retained when upgrading. Translations are initial
 drafts and should receive native-speaker review before upstream acceptance.
 
-AMD64 is the first published target. Change `deploy/home-assistant/platforms.json`
-to `["amd64", "arm64"]` to run the complete native build/test pipeline for both.
-No ARM64 app is advertised until all requested platform jobs pass. HA calls ARM64
-`aarch64`; the generator maps that to Docker's `linux/arm64`.
+AMD64 and ARM64 are enabled in `deploy/home-assistant/platforms.json`. Both run
+the complete build/test pipeline on native runners. ARM64 is advertised only
+after all requested platform jobs pass and the images are publicly pullable.
+HA calls ARM64 `aarch64`; the generator maps that to Docker's `linux/arm64`.
+The first publication for a new architecture tests cold restore with the candidate
+itself; later publications also test upgrading from its previous published image.
 
 The first GHCR packages may default to private. Make the two package visibilities public;
 the promote job refuses to advertise images that cannot be pulled anonymously. A rerun

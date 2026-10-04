@@ -113,6 +113,14 @@ def previous_package(owner_repo, channel):
         return None
 
 
+def baseline_for_arch(previous, arch):
+    # A newly supported architecture has no previous image to restore from.
+    # The workflow rehearses cold restore using the candidate itself instead.
+    if not previous or arch not in previous['platforms']:
+        return ''
+    return previous['image'].replace('{arch}', 'aarch64' if arch == 'arm64' else arch)
+
+
 def select(destination, owner_repo, version, wrapper_commit, platforms, force=False):
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', owner_repo):
         raise ValueError('Invalid repository')
@@ -178,7 +186,7 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             matrix.append({'channel': channel, 'arch': arch,
                            'hass_arch': 'aarch64' if arch == 'arm64' else arch,
                            'runner': 'ubuntu-24.04-arm' if arch == 'arm64' else 'ubuntu-24.04',
-                           'context': context.as_posix(), 'baseline': (provenance['baseline_image'] or '').replace('{arch}', 'aarch64' if arch == 'arm64' else arch)})
+                           'context': context.as_posix(), 'baseline': baseline_for_arch(previous, arch)})
         write(destination / (channel + '.json'), provenance)
     write(destination / 'matrix.json', {'include': matrix})
 
