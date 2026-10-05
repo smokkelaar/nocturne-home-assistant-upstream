@@ -65,6 +65,11 @@ class PublicationReadinessTests(unittest.TestCase):
                          [('build-and-push', 'success')]):
             self.assertEqual(candidate.paired_run(MAIN), 12)
 
+    def test_new_failure_is_not_hidden_by_an_older_pending_run(self):
+        with self.paired([self.run_record(conclusion='failure'), self.run_record('in_progress', None)]):
+            with self.assertRaises(ValueError):
+                candidate.paired_run(MAIN)
+
 
 class CandidateSelectionTests(unittest.TestCase):
     def select(self, destination, paired, previous=None, registry_error=None):

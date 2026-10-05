@@ -81,7 +81,7 @@ def paired_run(commit, branch=None):
         if names.get('build-and-push') == 'success' or all(names.get(k) == 'success'
                 for k in ('dotnet-images', 'web-image', 'report')):
             return run['id']
-    if not matching or any(run.get('status') != 'completed' for run in matching):
+    if not matching or (matching[0].get('status') is not None and matching[0]['status'] != 'completed'):
         raise UpstreamNotReady('Upstream publication has not completed for ' + commit)
     raise ValueError('No complete paired upstream publishing run for ' + commit)
 
