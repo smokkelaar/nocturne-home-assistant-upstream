@@ -72,6 +72,11 @@ unchanged-channel run can succeed without publishing a new version; a failed run
 leaves the last published version available. Open the workflow for individual
 check results.
 
+When an upstream publication has not started or is still running, selection
+defers that channel with a notice and a workflow summary. The next hourly run
+tries again; another ready channel can still be published. Completed failed
+publications, invalid source metadata and checksum mismatches remain errors.
+
 ### Home Assistant security and access
 
 Both channels use the same [app configuration](deploy/home-assistant/shared/app-spec.json).

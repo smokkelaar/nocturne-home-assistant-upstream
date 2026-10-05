@@ -15,7 +15,7 @@ sys.path.insert(0, str(BASE / 'shared/rootfs/opt/nocturne-ha'))
 sys.path.insert(0, str(BASE / 'tools'))
 import help_ui
 import run
-from candidate import links, registry, paired_run
+from candidate import links, registry, paired_run, UpstreamNotReady
 from check_locales import check
 
 
@@ -110,11 +110,11 @@ class SetupTests(unittest.TestCase):
     def test_paired_run_rejects_success_for_other_source_revision(self):
         with patch('candidate.github', return_value={'workflow_runs': [
                 {'head_sha': 'old', 'conclusion': 'success', 'id': 1}]}):
-            with self.assertRaisesRegex(ValueError, 'No complete paired'):
+            with self.assertRaisesRegex(UpstreamNotReady, 'Upstream publication has not completed'):
                 paired_run('current', 'main')
 
     def test_paired_run_requires_both_image_jobs_and_report(self):
-        listing = {'workflow_runs': [{'head_sha': 'current', 'conclusion': 'success', 'id': 1}]}
+        listing = {'workflow_runs': [{'head_sha': 'current', 'status': 'completed', 'conclusion': 'success', 'id': 1}]}
         for web_result in ['failure', 'success']:
             jobs = {'jobs': [{'name': name, 'conclusion': result} for name, result in
                     [('dotnet-images', 'success'), ('web-image', web_result), ('report', 'success')]]}

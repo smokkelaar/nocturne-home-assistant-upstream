@@ -53,6 +53,15 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write('matrix=' + json.dumps(matrix, separators=(',', ':')) + '\n')
               out.write('changed=' + str(bool(matrix['include'])).lower() + '\n')
+          deferred = json.load(open('work/candidates/deferred.json'))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## Publication selection\n\n')
+              for channel in sorted({item['channel'] for item in matrix['include']}):
+                  summary.write(f'- {channel}: selected for build and validation.\n')
+              for item in deferred:
+                  summary.write(f"- {item['channel']}: deferred; upstream publication for `{item['commit']}` is not complete. Retry on the next scheduled run.\n")
+              if not matrix['include'] and not deferred:
+                  summary.write('Published channels are unchanged; no build needed.\n')
           PY
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

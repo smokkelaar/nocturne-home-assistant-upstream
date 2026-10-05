@@ -18,6 +18,10 @@ ACCEPT = ', '.join(['application/vnd.oci.image.index.v1+json',
                    'application/vnd.docker.distribution.manifest.v2+json'])
 
 
+class UpstreamNotReady(Exception):
+    pass
+
+
 def fetch(url, headers=None):
     request = urllib.request.Request(url, headers={'User-Agent': 'nocturne-ha-publisher', **(headers or {})})
     with urllib.request.urlopen(request, timeout=30) as response:
@@ -68,14 +72,17 @@ def registry(repository, reference, arch, revision=None, labels=None):
 def paired_run(commit, branch=None):
     suffix = f'&branch={branch}' if branch else ''
     runs = github('actions/workflows/docker-publish.yml/runs?per_page=50&head_sha=' + commit + suffix)
-    for run in runs['workflow_runs']:
-        if run.get('head_sha') != commit or run.get('conclusion') != 'success':
+    matching = [run for run in runs['workflow_runs'] if run.get('head_sha') == commit]
+    for run in matching:
+        if run.get('conclusion') != 'success':
             continue
         jobs = github(f"actions/runs/{run['id']}/jobs?per_page=100")['jobs']
         names = {j['name']: j['conclusion'] for j in jobs}
         if names.get('build-and-push') == 'success' or all(names.get(k) == 'success'
                 for k in ('dotnet-images', 'web-image', 'report')):
             return run['id']
+    if not matching or any(run.get('status') != 'completed' for run in matching):
+        raise UpstreamNotReady('Upstream publication has not completed for ' + commit)
     raise ValueError('No complete paired upstream publishing run for ' + commit)
 
 
@@ -135,9 +142,9 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
     main_commit = github('commits/main')['sha']
     recipe = recipe_hash()
     matrix = []
+    deferred = []
     for channel, commit, tag in [('stable', stable_commit, release['tag_name'][1:]),
                                  ('main', main_commit, 'main-' + main_commit[:7])]:
-        run_id = paired_run(commit, 'main' if channel == 'main' else None)
         previous = None
         try:
             previous = fetch(f'https://raw.githubusercontent.com/{owner_repo}/home-assistant/{channel}/provenance.json')[0]
@@ -145,6 +152,12 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             if error.code != 404:
                 raise
         if not force and previous and previous['commit'] == commit and previous['recipe'] == recipe and previous['platforms'] == platforms:
+            continue
+        try:
+            run_id = paired_run(commit, 'main' if channel == 'main' else None)
+        except UpstreamNotReady as error:
+            deferred.append({'channel': channel, 'commit': commit, 'reason': str(error)})
+            print(f'::notice title=Upstream publication pending::{channel}: {error}; retry on the next scheduled run.')
             continue
         published = previous_package(owner_repo, channel)
         require_upgrade(version, published['version'] if published else None)
@@ -189,6 +202,7 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
                            'context': context.as_posix(), 'baseline': baseline_for_arch(previous, arch)})
         write(destination / (channel + '.json'), provenance)
     write(destination / 'matrix.json', {'include': matrix})
+    write(destination / 'deferred.json', deferred)
 
 
 if __name__ == '__main__':
