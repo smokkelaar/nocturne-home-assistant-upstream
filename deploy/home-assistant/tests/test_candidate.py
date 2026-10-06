@@ -125,7 +125,8 @@ class CandidateSelectionTests(unittest.TestCase):
 
     def test_force_selects_unchanged_channels_for_validation(self):
         with tempfile.TemporaryDirectory() as root:
-            previous = {'commit': STABLE, 'recipe': 'recipe', 'platforms': ['amd64']}
+            previous = {'commit': STABLE, 'recipe': 'recipe', 'platforms': ['amd64'],
+                        'image': 'ghcr.io/example/wrapper/nocturne-{arch}:0.2.100'}
             publisher = self.select(Path(root), [12, 13], previous, force=True)
             self.assertEqual(publisher.call_args_list[0].args, (STABLE, None))
             self.assertEqual(publisher.call_args_list[1].args, (MAIN, 'main'))
