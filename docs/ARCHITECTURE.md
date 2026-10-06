@@ -3,8 +3,10 @@
 Stable and Main explicitly forward the selected Nocturne source SHA as
 `GIT_COMMIT` and preserve the API image's `BUILD_DATE` in the isolated API process
 environment. Other parent environment variables, including Supervisor credentials,
-are not inherited. The real API status response is checked in container smoke
-tests, so Nocturne's About panel retains its Commit and Built fields.
+are not inherited. Fresh-instance smoke tests verify the API process environment,
+and configured-container smoke tests compare `/api/v3/version` with the pinned
+source commit and API build date, so Nocturne's About panel retains its Commit and
+Built fields.
 
 ## One shared runtime, two isolated channels
 

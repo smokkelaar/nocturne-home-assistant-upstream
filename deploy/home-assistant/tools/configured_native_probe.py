@@ -4,9 +4,11 @@ import json
 from pathlib import Path
 import ssl
 import sys
+import urllib.request
 
 sys.path.insert(0, '/opt/nocturne-ha')
 import run
+import settings
 
 phase = 'CONFIGURED_GUARD'
 try:
@@ -14,6 +16,19 @@ try:
     assert options['gateway_auth'] is False
     run.verify_native_auth(options)  # Real upstream status + authorization, no mocks.
     assert run.web_response_reachable(options)
+
+    # The v3 version endpoint is tenant-routed; check it after the disposable tenant exists.
+    metadata = json.loads(Path('/opt/nocturne-ha/version.json').read_text())
+    expected_metadata = settings.api_build_metadata(metadata)
+    version_request = urllib.request.Request(
+        'http://127.0.0.1:8080/api/v3/version',
+        headers={'Host': options['authority'], 'X-Forwarded-Host': options['authority'],
+                 'X-Forwarded-Proto': 'https', 'Accept': 'application/json'})
+    with urllib.request.urlopen(version_request, timeout=10) as response:
+        assert response.status == 200
+        version = json.loads(response.read(65536))
+    assert version['head'] == expected_metadata['GIT_COMMIT']
+    assert version['build'] == expected_metadata['BUILD_DATE']
 
     def probe(path, expected, host=None, body=None, authorization=None):
         connection = http.client.HTTPSConnection(

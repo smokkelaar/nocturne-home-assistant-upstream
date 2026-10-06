@@ -63,19 +63,6 @@ import settings
 options = settings.validate_options({})
 with socket.create_connection(('127.0.0.1', 8080), timeout=2):
     pass
-metadata = json.loads(Path('/opt/nocturne-ha/version.json').read_text())
-expected_metadata = settings.api_build_metadata(metadata)
-version_request = urllib.request.Request(
-    'http://127.0.0.1:8080/api/v3/version',
-    headers={'Host': options['authority'], 'Accept': 'application/json'})
-with urllib.request.urlopen(version_request, timeout=10) as response:
-    assert response.status == 200
-    version = json.loads(response.read(65536))
-assert version['head'] == expected_metadata['GIT_COMMIT']
-assert version['build'] == expected_metadata['BUILD_DATE']
-from datetime import datetime
-build_date = datetime.fromisoformat(version['build'].replace('Z', '+00:00'))
-assert build_date.tzinfo is not None
 if hasattr(run, 'web_response_reachable'):  # Baseline 0.1.0 predates this check.
     if not run.web_response_reachable(options):
         raise ConnectionError('Web service is not ready')
