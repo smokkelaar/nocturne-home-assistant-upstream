@@ -53,7 +53,9 @@ class DiagnosticTests(unittest.TestCase):
 
     def test_cli_rejects_external_or_mutating_targets_before_connecting(self):
         for path in ('https://example.com/api/v3/version', '//example.com/api/v3/version',
-                     '/api/../secret', '/status', '/api/status\r\nHost: example.com'):
+                     '/api/../secret', '/api/%2e%2e/secret',
+                     '/api/nested%2f..%2fsecret', '/status',
+                     '/api/status\r\nHost: example.com'):
             with self.subTest(path=path), \
                     patch.object(cli, 'checked_options') as options, \
                     patch.object(cli.http.client, 'HTTPConnection') as connection:

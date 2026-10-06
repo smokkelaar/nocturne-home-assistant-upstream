@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import socket
 import sys
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 DATA = Path('/data')
 
@@ -57,9 +57,11 @@ def doctor():
 
 
 def api_request(path):
+    parsed = urlsplit(path)
+    decoded_path = unquote(parsed.path)
     if (not path.startswith('/api/') or any(c in path for c in '\r\n#\x00')
-            or any(c.isspace() for c in path) or urlsplit(path).netloc
-            or '..' in path.split('/')):
+            or any(c.isspace() for c in path) or parsed.netloc
+            or not decoded_path.startswith('/api/') or '..' in decoded_path.split('/')):
         raise ValueError('Use a local /api/... path')
     checked = checked_options()
     connection = http.client.HTTPConnection('127.0.0.1', 8080, timeout=15)
