@@ -34,6 +34,7 @@ class DiagnosticTests(unittest.TestCase):
         self.assertNotIn('/api/v1/status', probe)
         self.assertNotIn('/api/v3/version', probe)
         self.assertIn("socket.create_connection(('127.0.0.1', 8080)", probe)
+        self.assertIn("options['hostname'] + ':8448'", probe)
         self.assertNotIn('run.api_reachable(', probe)
 
     def test_cli_rejects_external_or_mutating_targets_before_connecting(self):
