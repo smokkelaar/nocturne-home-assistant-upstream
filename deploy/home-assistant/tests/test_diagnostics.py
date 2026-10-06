@@ -33,12 +33,14 @@ class DiagnosticTests(unittest.TestCase):
 
     def test_fresh_instance_probe_checks_runtime_metadata_without_setup(self):
         probe = (BASE / 'tools/smoke.py').read_text()
-        self.assertIn('settings.api_build_metadata(metadata)', probe)
+        self.assertIn("'/api/v3/version'", probe)
+        self.assertIn("version['head'] == expected_metadata['GIT_COMMIT']", probe)
+        self.assertIn("version['build'] == expected_metadata['BUILD_DATE']", probe)
+        self.assertIn("datetime.fromisoformat(version['build'].replace('Z', '+00:00'))", probe)
         self.assertIn("execute(name, API_ENV_PROBE, user='app')", probe)
         self.assertIn("process_environment.get(b'ASPNETCORE_URLS')", probe)
         self.assertIn("raise ConnectionError('Web service is not ready')", probe)
         self.assertNotIn('/api/v1/status', probe)
-        self.assertNotIn('/api/v3/version', probe)
         self.assertIn("socket.create_connection(('127.0.0.1', 8080)", probe)
         self.assertIn("options['hostname'] + ':8448'", probe)
         self.assertNotIn('run.api_reachable(', probe)
