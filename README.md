@@ -28,6 +28,9 @@ Development experiments and smokkelaar's personal test builds live in
 Suitable changes are carried over here after testing; experimental Personal and
 Test A/B/C builds are not automatically included in Stable or Main.
 
+Stable and Main include a read-only in-container `nocturne-ha` diagnostic CLI.
+See [usage and safety boundaries](deploy/home-assistant/CLI.md).
+
 ## At a glance
 
 The version badges read the **published `home-assistant` branch**, so they update

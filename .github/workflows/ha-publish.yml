@@ -8,6 +8,8 @@ on:
         description: Rebuild unchanged upstream versions (dependency maintenance)
         type: boolean
         default: false
+  pull_request:
+    paths: ['deploy/home-assistant/**', '.github/workflows/ha-publish.yml']
   push:
     branches: [main]
     paths: ['deploy/home-assistant/**', '.github/workflows/ha-publish.yml']
@@ -87,6 +89,7 @@ jobs:
           name: candidates
           path: work/candidates
       - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -111,14 +114,18 @@ jobs:
           else
             python deploy/home-assistant/tools/recovery_smoke.py --image "$IMAGE" --baseline "$IMAGE"
           fi
-          if docker manifest inspect "$IMAGE" >/dev/null 2>&1; then
-            echo 'Refusing to overwrite an existing version tag'
-            exit 1
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            echo 'Pull request image passed smoke/recovery checks; it will not be published.'
+          else
+            if docker manifest inspect "$IMAGE" >/dev/null 2>&1; then
+              echo 'Refusing to overwrite an existing version tag'
+              exit 1
+            fi
+            docker push "$IMAGE"
           fi
-          docker push "$IMAGE"
   promote:
     needs: [select, build]
-    if: needs.select.outputs.changed == 'true'
+    if: needs.select.outputs.changed == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
