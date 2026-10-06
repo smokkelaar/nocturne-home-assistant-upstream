@@ -32,6 +32,7 @@ class DiagnosticTests(unittest.TestCase):
         self.assertIn('settings.api_build_metadata(metadata)', probe)
         self.assertIn("execute(name, API_ENV_PROBE, user='app')", probe)
         self.assertIn("process_environment.get(b'ASPNETCORE_URLS')", probe)
+        self.assertIn("raise ConnectionError('Web service is not ready')", probe)
         self.assertNotIn('/api/v1/status', probe)
         self.assertNotIn('/api/v3/version', probe)
         self.assertIn("socket.create_connection(('127.0.0.1', 8080)", probe)
