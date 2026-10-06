@@ -31,6 +31,7 @@ class DiagnosticTests(unittest.TestCase):
         probe = (BASE / 'tools/smoke.py').read_text()
         self.assertIn('http://127.0.0.1:8080/api/v3/version', probe)
         self.assertNotIn('http://127.0.0.1:8080/api/v1/status', probe)
+        self.assertIn("run.api_reachable(options['hostname'])", probe)
 
     def test_cli_rejects_external_or_mutating_targets_before_connecting(self):
         for path in ('https://example.com/api/v3/version', '//example.com/api/v3/version',
