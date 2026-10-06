@@ -18,6 +18,7 @@ try:
     assert run.web_response_reachable(options)
 
     # The v3 version endpoint is tenant-routed; check it after the disposable tenant exists.
+    phase = 'VERSION_METADATA'
     metadata = json.loads(Path('/opt/nocturne-ha/version.json').read_text())
     expected_metadata = settings.api_build_metadata(metadata)
     version_request = urllib.request.Request(

@@ -37,6 +37,8 @@ class DiagnosticTests(unittest.TestCase):
         spec.loader.exec_module(smoke)
         probe = smoke.PROBE
         configured_probe = (BASE / 'tools/configured_native_probe.py').read_text()
+        self.assertLess(configured_probe.index("phase = 'VERSION_METADATA'"),
+                        configured_probe.index("version_request = urllib.request.Request("))
         self.assertIn("execute(name, API_ENV_PROBE, user='app')",
                       (BASE / 'tools/smoke.py').read_text())
         self.assertIn("process_environment.get(b'ASPNETCORE_URLS')", smoke.API_ENV_PROBE)
