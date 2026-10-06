@@ -125,6 +125,7 @@ are read-only; the assistant does not change your router or Home Assistant Core 
 - [Exact upstream integration plan](docs/UPSTREAM-INTEGRATION.md)
 - [Architecture and automatic publication](docs/ARCHITECTURE.md)
 - [Acceptance and migration checklist](docs/ACCEPTANCE.md)
+- [Forking and publishing your own copy](docs/FORKING.md)
 - [Issue discussion and rationale](https://github.com/smokkelaar/nocturne-home-assistant/issues/41)
 
 ## Development
