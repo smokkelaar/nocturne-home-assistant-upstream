@@ -29,7 +29,7 @@ class DiagnosticTests(unittest.TestCase):
 
     def test_fresh_instance_probe_checks_runtime_metadata_without_setup(self):
         probe = (BASE / 'tools/smoke.py').read_text()
-        self.assertIn("b'/app/Nocturne.API.dll' in command", probe)
+        self.assertIn("b'ASPNETCORE_URLS'", probe)
         self.assertIn('settings.api_build_metadata(metadata)', probe)
         self.assertNotIn('/api/v1/status', probe)
         self.assertNotIn('/api/v3/version', probe)
