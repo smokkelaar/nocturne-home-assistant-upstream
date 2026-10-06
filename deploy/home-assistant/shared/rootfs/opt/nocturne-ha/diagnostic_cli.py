@@ -40,8 +40,9 @@ def doctor():
             result['certificate'] = 'configured certificate failed validation'
     else:
         result['certificate'] = 'local test certificate; browser trust not guaranteed'
-    connection = http.client.HTTPConnection('127.0.0.1', 8080, timeout=3)
+    connection = None
     try:
+        connection = http.client.HTTPConnection('127.0.0.1', 8080, timeout=3)
         connection.request('GET', '/api/v3/version',
                           headers={'Host': checked['authority'], 'Accept': 'application/json'})
         response = connection.getresponse()
@@ -50,7 +51,8 @@ def doctor():
     except (OSError, http.client.HTTPException):
         pass
     finally:
-        connection.close()
+        if connection is not None:
+            connection.close()
     return result
 
 
