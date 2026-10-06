@@ -128,6 +128,21 @@ def baseline_for_arch(previous, arch):
     return previous['image'].replace('{arch}', 'aarch64' if arch == 'arm64' else arch)
 
 
+def require_complete_pr_matrix(matrix, deferred, platforms):
+    expected = {(channel, arch) for channel in ('stable', 'main') for arch in platforms}
+    included = matrix.get('include', [])
+    actual = {(item['channel'], item['arch']) for item in included}
+    if deferred or actual != expected or len(included) != len(expected):
+        missing = ', '.join(f'{channel}/{arch}' for channel, arch in sorted(expected - actual))
+        pending = ', '.join(sorted({item['channel'] for item in deferred}))
+        details = []
+        if missing:
+            details.append('missing ' + missing)
+        if pending:
+            details.append('upstream publication pending for ' + pending)
+        raise ValueError('PR validation requires every Stable/Main image; ' + '; '.join(details))
+
+
 def select(destination, owner_repo, version, wrapper_commit, platforms, force=False):
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', owner_repo):
         raise ValueError('Invalid repository')

@@ -50,12 +50,17 @@ jobs:
           python deploy/home-assistant/tools/check_locales.py --upstream
           python deploy/home-assistant/tools/candidate.py --output work/candidates --repository "$REPOSITORY" --version "$VERSION" --commit "$COMMIT" --platforms "$PLATFORMS" "${EXTRA[@]}"
           python - <<'PY'
-          import json, os
+          import json, os, sys
+          sys.path.insert(0, 'deploy/home-assistant/tools')
+          import candidate
           matrix = json.load(open('work/candidates/matrix.json'))
+          deferred = json.load(open('work/candidates/deferred.json'))
+          if os.environ['GITHUB_EVENT_NAME'] == 'pull_request':
+              candidate.require_complete_pr_matrix(
+                  matrix, deferred, json.load(open('deploy/home-assistant/platforms.json')))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write('matrix=' + json.dumps(matrix, separators=(',', ':')) + '\n')
               out.write('changed=' + str(bool(matrix['include'])).lower() + '\n')
-          deferred = json.load(open('work/candidates/deferred.json'))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
               summary.write('## Publication selection\n\n')
               for channel in sorted({item['channel'] for item in matrix['include']}):
@@ -91,7 +96,6 @@ jobs:
           name: candidates
           path: work/candidates
       - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
-        if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -116,15 +120,11 @@ jobs:
           else
             python deploy/home-assistant/tools/recovery_smoke.py --image "$IMAGE" --baseline "$IMAGE"
           fi
-          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            echo 'Pull request image passed smoke/recovery checks; it will not be published.'
-          else
-            if docker manifest inspect "$IMAGE" >/dev/null 2>&1; then
-              echo 'Refusing to overwrite an existing version tag'
-              exit 1
-            fi
-            docker push "$IMAGE"
+          if docker manifest inspect "$IMAGE" >/dev/null 2>&1; then
+            echo 'Refusing to overwrite an existing version tag'
+            exit 1
           fi
+          docker push "$IMAGE"
   build-pr:
     needs: select
     if: needs.select.outputs.changed == 'true' && github.event_name == 'pull_request'

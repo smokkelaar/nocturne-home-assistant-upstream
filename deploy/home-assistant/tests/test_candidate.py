@@ -133,6 +133,21 @@ class CandidateSelectionTests(unittest.TestCase):
             matrix = json.loads((Path(root) / 'matrix.json').read_text())
             self.assertEqual([item['channel'] for item in matrix['include']], ['stable', 'main'])
 
+    def test_pr_validation_requires_every_channel_and_platform(self):
+        platforms = ['amd64', 'arm64']
+        complete = {'include': [{'channel': channel, 'arch': arch}
+                                for channel in ('stable', 'main') for arch in platforms]}
+        candidate.require_complete_pr_matrix(complete, [], platforms)
+        with self.assertRaisesRegex(ValueError, 'upstream publication pending for main'):
+            candidate.require_complete_pr_matrix(
+                {'include': [item for item in complete['include'] if item['channel'] == 'stable']},
+                [{'channel': 'main'}], platforms)
+        with self.assertRaisesRegex(ValueError, 'missing main/arm64'):
+            candidate.require_complete_pr_matrix(
+                {'include': [item for item in complete['include']
+                             if (item['channel'], item['arch']) != ('main', 'arm64')]},
+                [], platforms)
+
     def test_completed_failure_still_fails_selection(self):
         with tempfile.TemporaryDirectory() as root, self.assertRaisesRegex(ValueError, 'Failed publication'):
             self.select(Path(root), [ValueError('Failed publication')])
