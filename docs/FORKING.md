@@ -104,8 +104,10 @@ to the same Home Assistant instance. Both offer apps with the same names and por
 
 - README badges and links still point to `smokkelaar`. Update them in your fork for
   correct status badges.
-- The store name and maintainer in `repository.yaml` are generated from your
-  repository. Do not edit that file by hand.
+- `repository.yaml` is generated on every publication. Its URL and maintainer come
+  from your repository. Its name is always `Nocturne Home Assistant (experimental)`
+  (`deploy/home-assistant/tools/publish_store.py`). Do not edit the generated file;
+  change that tool if you want a different store name.
 
 ## Troubleshooting
 
