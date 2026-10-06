@@ -32,13 +32,17 @@ class DiagnosticTests(unittest.TestCase):
                       (root / 'Dockerfile.in').read_text())
 
     def test_fresh_instance_probe_checks_runtime_metadata_without_setup(self):
-        probe = (BASE / 'tools/smoke.py').read_text()
-        self.assertIn("'/api/v3/version'", probe)
+        spec = importlib.util.spec_from_file_location('smoke_probe', BASE / 'tools/smoke.py')
+        smoke = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(smoke)
+        probe = smoke.PROBE
+        self.assertIn('/api/v3/version', probe)
         self.assertIn("version['head'] == expected_metadata['GIT_COMMIT']", probe)
         self.assertIn("version['build'] == expected_metadata['BUILD_DATE']", probe)
         self.assertIn("datetime.fromisoformat(version['build'].replace('Z', '+00:00'))", probe)
-        self.assertIn("execute(name, API_ENV_PROBE, user='app')", probe)
-        self.assertIn("process_environment.get(b'ASPNETCORE_URLS')", probe)
+        self.assertIn("execute(name, API_ENV_PROBE, user='app')",
+                      (BASE / 'tools/smoke.py').read_text())
+        self.assertIn("process_environment.get(b'ASPNETCORE_URLS')", smoke.API_ENV_PROBE)
         self.assertIn("raise ConnectionError('Web service is not ready')", probe)
         self.assertNotIn('/api/v1/status', probe)
         self.assertIn("socket.create_connection(('127.0.0.1', 8080)", probe)
