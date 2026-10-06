@@ -45,7 +45,7 @@ jobs:
         run: |
           VERSION=$(python deploy/home-assistant/tools/versions.py --repository "$REPOSITORY" --run-number "$RUN_NUMBER" --attempt "$RUN_ATTEMPT")
           EXTRA=()
-          if [ "$FORCE" = true ]; then EXTRA+=(--force); fi
+          if [ "$FORCE" = true ] || [ "$GITHUB_EVENT_NAME" = pull_request ]; then EXTRA+=(--force); fi
           PLATFORMS=$(python -c "import json; print(','.join(json.load(open('deploy/home-assistant/platforms.json'))))")
           python deploy/home-assistant/tools/check_locales.py --upstream
           python deploy/home-assistant/tools/candidate.py --output work/candidates --repository "$REPOSITORY" --version "$VERSION" --commit "$COMMIT" --platforms "$PLATFORMS" "${EXTRA[@]}"

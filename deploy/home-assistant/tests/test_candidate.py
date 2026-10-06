@@ -72,7 +72,7 @@ class PublicationReadinessTests(unittest.TestCase):
 
 
 class CandidateSelectionTests(unittest.TestCase):
-    def select(self, destination, paired, previous=None, registry_error=None):
+    def select(self, destination, paired, previous=None, registry_error=None, force=False):
         def github(path):
             return {
                 'releases/latest': {'draft': False, 'prerelease': False, 'tag_name': 'v0.2.4'},
@@ -94,7 +94,7 @@ class CandidateSelectionTests(unittest.TestCase):
                              side_effect=registry_error), \
                 patch.object(candidate.urllib.request, 'urlopen',
                              side_effect=lambda *args, **kwargs: io.BytesIO(b'PNPM_VERSION: 10.13.1')):
-            candidate.select(destination, 'example/wrapper', '0.2.101', WRAPPER, ['amd64'])
+            candidate.select(destination, 'example/wrapper', '0.2.101', WRAPPER, ['amd64'], force=force)
             return publisher
 
     def test_main_pending_does_not_block_ready_stable(self):
@@ -122,6 +122,15 @@ class CandidateSelectionTests(unittest.TestCase):
             previous = {'commit': STABLE, 'recipe': 'recipe', 'platforms': ['amd64']}
             publisher = self.select(Path(root), [candidate.UpstreamNotReady('Pending')], previous)
             publisher.assert_called_once_with(MAIN, 'main')
+
+    def test_force_selects_unchanged_channels_for_validation(self):
+        with tempfile.TemporaryDirectory() as root:
+            previous = {'commit': STABLE, 'recipe': 'recipe', 'platforms': ['amd64']}
+            publisher = self.select(Path(root), [12, 13], previous, force=True)
+            self.assertEqual(publisher.call_args_list[0].args, (STABLE, None))
+            self.assertEqual(publisher.call_args_list[1].args, (MAIN, 'main'))
+            matrix = json.loads((Path(root) / 'matrix.json').read_text())
+            self.assertEqual([item['channel'] for item in matrix['include']], ['stable', 'main'])
 
     def test_completed_failure_still_fails_selection(self):
         with tempfile.TemporaryDirectory() as root, self.assertRaisesRegex(ValueError, 'Failed publication'):
