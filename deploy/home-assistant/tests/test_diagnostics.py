@@ -64,6 +64,15 @@ class DiagnosticTests(unittest.TestCase):
                 options.assert_not_called()
                 connection.assert_not_called()
 
+    def test_checked_options_rejects_non_object_json(self):
+        validator = Mock()
+        with patch.object(cli, 'DATA', Path('/mock')), \
+                patch.object(Path, 'read_text', return_value='[]'), \
+                patch.dict('sys.modules', {'settings': SimpleNamespace(validate_options=validator)}):
+            with self.assertRaisesRegex(ValueError, 'JSON object'):
+                cli.checked_options()
+        validator.assert_not_called()
+
     def test_doctor_reports_configuration_dns_certificate_and_api(self):
         options = {'hostname': 'nocturne.example', 'authority': 'nocturne.example:8448',
                    'public_url': 'https://nocturne.example', 'certificate': 'cert.pem',
@@ -85,13 +94,15 @@ class DiagnosticTests(unittest.TestCase):
         http.assert_called_once_with('127.0.0.1', 8080, timeout=3)
 
     def test_doctor_handles_bad_configuration_and_unreachable_services(self):
-        with patch.object(cli, 'checked_options', side_effect=ValueError('invalid')), \
-                patch.object(cli.socket, 'getaddrinfo') as dns, \
-                patch.object(cli.http.client, 'HTTPConnection') as http:
-            invalid = cli.doctor()
-        self.assertEqual('invalid', invalid['configuration'])
-        dns.assert_not_called()
-        http.assert_not_called()
+        for error in (ValueError('invalid'), TypeError('invalid'), AttributeError('invalid')):
+            with self.subTest(error=type(error).__name__), \
+                    patch.object(cli, 'checked_options', side_effect=error), \
+                    patch.object(cli.socket, 'getaddrinfo') as dns, \
+                    patch.object(cli.http.client, 'HTTPConnection') as http:
+                invalid = cli.doctor()
+            self.assertEqual('invalid', invalid['configuration'])
+            dns.assert_not_called()
+            http.assert_not_called()
 
         options = {'hostname': 'nocturne.example', 'authority': 'nocturne.example:8448',
                    'public_url': 'https://nocturne.example', 'certificate': '',
@@ -115,6 +126,13 @@ class DiagnosticTests(unittest.TestCase):
                 redirect_stderr(stderr):
             self.assertEqual(1, cli.main(['api', '/api/v3/version']))
         self.assertIn('Diagnostics failed: offline', stderr.getvalue())
+
+        for error in (TypeError('malformed'), AttributeError('malformed')):
+            with self.subTest(error=type(error).__name__), \
+                    patch.object(cli, 'checked_options', side_effect=error), \
+                    redirect_stderr(stderr):
+                self.assertEqual(1, cli.main(['api', '/api/v3/version']))
+            self.assertIn('Diagnostics failed: malformed', stderr.getvalue())
 
 
 if __name__ == '__main__':

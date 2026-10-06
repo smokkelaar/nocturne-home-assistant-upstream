@@ -13,7 +13,10 @@ DATA = Path('/data')
 
 def checked_options():
     from settings import validate_options
-    return validate_options(json.loads((DATA / 'options.json').read_text()))
+    options = json.loads((DATA / 'options.json').read_text())
+    if not isinstance(options, dict):
+        raise ValueError('options.json must contain a JSON object')
+    return validate_options(options)
 
 
 def doctor():
@@ -21,7 +24,7 @@ def doctor():
               'certificate': 'not checked', 'api': 'not reachable'}
     try:
         checked = checked_options()
-    except (OSError, UnicodeError, ValueError, KeyError):
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError, AttributeError):
         return result
     result['configuration'] = 'valid'
     result['public_url'] = checked['public_url']
@@ -91,7 +94,8 @@ def main(argv=None):
             print(json.dumps(doctor(), indent=2, ensure_ascii=False))
             return 0
         return api_request(args.path)
-    except (OSError, UnicodeError, ValueError, KeyError, http.client.HTTPException) as error:
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError, AttributeError,
+            http.client.HTTPException) as error:
         print(f'Diagnostics failed: {error}', file=sys.stderr)
         return 1
 
