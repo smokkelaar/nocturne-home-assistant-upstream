@@ -11,6 +11,15 @@ spec.loader.exec_module(cli)
 
 
 class DiagnosticTests(unittest.TestCase):
+    def test_smoke_probe_reports_only_safe_failure_markers(self):
+        spec = importlib.util.spec_from_file_location('smoke_probe', BASE / 'tools/smoke.py')
+        smoke = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(smoke)
+        marker = smoke.safe_failure_marker(
+            'AssertionError: credential-value\nCI_PROBE_FAILED:AssertionError:LINE_12')
+        self.assertEqual('CI_PROBE_FAILED:AssertionError:LINE_12', marker.group(0))
+        self.assertIsNone(smoke.safe_failure_marker('credential-value'))
+
     def test_stable_and_main_image_include_read_only_diagnostics(self):
         root = BASE / 'shared'
         self.assertTrue((root / 'rootfs/usr/local/bin/nocturne-ha').is_file())
