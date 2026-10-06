@@ -27,10 +27,12 @@ class DiagnosticTests(unittest.TestCase):
         self.assertIn('/usr/local/bin/nocturne-ha',
                       (root / 'Dockerfile.in').read_text())
 
-    def test_fresh_instance_probe_uses_setup_independent_version_endpoint(self):
+    def test_fresh_instance_probe_checks_runtime_metadata_without_setup(self):
         probe = (BASE / 'tools/smoke.py').read_text()
-        self.assertIn('http://127.0.0.1:8080/api/v3/version', probe)
-        self.assertNotIn('http://127.0.0.1:8080/api/v1/status', probe)
+        self.assertIn("b'/app/Nocturne.API.dll' in command", probe)
+        self.assertIn('settings.api_build_metadata(metadata)', probe)
+        self.assertNotIn('/api/v1/status', probe)
+        self.assertNotIn('/api/v3/version', probe)
         self.assertIn("socket.create_connection(('127.0.0.1', 8080)", probe)
         self.assertNotIn('run.api_reachable(', probe)
 
