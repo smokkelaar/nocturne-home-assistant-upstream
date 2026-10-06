@@ -1,7 +1,11 @@
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
+import io
+import json
 from pathlib import Path
+from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 BASE = Path(__file__).resolve().parents[1]
 CLI_PATH = BASE / 'shared/rootfs/opt/nocturne-ha/diagnostic_cli.py'
@@ -49,6 +53,58 @@ class DiagnosticTests(unittest.TestCase):
                     cli.api_request(path)
                 options.assert_not_called()
                 connection.assert_not_called()
+
+    def test_doctor_reports_configuration_dns_certificate_and_api(self):
+        options = {'hostname': 'nocturne.example', 'authority': 'nocturne.example:8448',
+                   'public_url': 'https://nocturne.example', 'certificate': 'cert.pem',
+                   'private_key': 'key.pem'}
+        response = SimpleNamespace(status=200, read=lambda _: b'{}')
+        connection = SimpleNamespace(request=lambda *args, **kwargs: None,
+                                     getresponse=lambda: response, close=lambda: None)
+        inspect_pair = Mock()
+        with patch.object(cli, 'checked_options', return_value=options), \
+                patch.object(cli.socket, 'getaddrinfo', return_value=[]), \
+                patch.dict('sys.modules', {'tls': SimpleNamespace(inspect_pair=inspect_pair)}), \
+                patch.object(cli.http.client, 'HTTPConnection', return_value=connection) as http:
+            result = cli.doctor()
+        self.assertEqual('valid', result['configuration'])
+        self.assertIn('resolves', result['dns'])
+        self.assertEqual('configured certificate checked', result['certificate'])
+        self.assertEqual('responding (HTTP 200)', result['api'])
+        inspect_pair.assert_called_once()
+        http.assert_called_once_with('127.0.0.1', 8080, timeout=3)
+
+    def test_doctor_handles_bad_configuration_and_unreachable_services(self):
+        with patch.object(cli, 'checked_options', side_effect=ValueError('invalid')), \
+                patch.object(cli.socket, 'getaddrinfo') as dns, \
+                patch.object(cli.http.client, 'HTTPConnection') as http:
+            invalid = cli.doctor()
+        self.assertEqual('invalid', invalid['configuration'])
+        dns.assert_not_called()
+        http.assert_not_called()
+
+        options = {'hostname': 'nocturne.example', 'authority': 'nocturne.example:8448',
+                   'public_url': 'https://nocturne.example', 'certificate': '',
+                   'private_key': ''}
+        with patch.object(cli, 'checked_options', return_value=options), \
+                patch.object(cli.socket, 'getaddrinfo', side_effect=OSError), \
+                patch.object(cli.http.client, 'HTTPConnection', side_effect=OSError):
+            unavailable = cli.doctor()
+        self.assertEqual('does not resolve from this container', unavailable['dns'])
+        self.assertIn('local test certificate', unavailable['certificate'])
+        self.assertEqual('not reachable', unavailable['api'])
+
+    def test_cli_emits_doctor_json_and_returns_api_failure_status(self):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with patch.object(cli, 'doctor', return_value={'configuration': 'valid'}), \
+                redirect_stdout(stdout):
+            self.assertEqual(0, cli.main(['doctor']))
+        self.assertEqual({'configuration': 'valid'}, json.loads(stdout.getvalue()))
+
+        with patch.object(cli, 'api_request', side_effect=OSError('offline')), \
+                redirect_stderr(stderr):
+            self.assertEqual(1, cli.main(['api', '/api/v3/version']))
+        self.assertIn('Diagnostics failed: offline', stderr.getvalue())
 
 
 if __name__ == '__main__':

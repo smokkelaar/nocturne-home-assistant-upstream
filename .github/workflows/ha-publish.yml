@@ -16,8 +16,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ha-publish
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('ha-publish-pr-{0}', github.event.pull_request.number) || 'ha-publish' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   select:
     runs-on: ubuntu-24.04
@@ -73,7 +73,7 @@ jobs:
           retention-days: 7
   build:
     needs: select
-    if: needs.select.outputs.changed == 'true'
+    if: needs.select.outputs.changed == 'true' && github.event_name != 'pull_request'
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
@@ -84,6 +84,8 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: candidates
@@ -123,6 +125,45 @@ jobs:
             fi
             docker push "$IMAGE"
           fi
+  build-pr:
+    needs: select
+    if: needs.select.outputs.changed == 'true' && github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: candidates
+          path: work/candidates
+      - name: Build and validate PR images without publishing credentials
+        env:
+          CONTEXT: ${{ matrix.context }}
+          REPOSITORY: ${{ github.repository }}
+          CHANNEL: ${{ matrix.channel }}
+          ARCH: ${{ matrix.arch }}
+          HASS_ARCH: ${{ matrix.hass_arch }}
+          VERSION: ${{ needs.select.outputs.version }}
+          BASELINE: ${{ matrix.baseline }}
+        run: |
+          IMAGE="ghcr.io/${REPOSITORY,,}/nocturne-${CHANNEL}-${HASS_ARCH}:$VERSION"
+          docker build --platform "linux/$ARCH" --tag "$IMAGE" "$CONTEXT"
+          python deploy/home-assistant/tools/smoke.py --image "$IMAGE"
+          python deploy/home-assistant/tools/setup_smoke.py --image "$IMAGE"
+          if [ -n "$BASELINE" ]; then
+            docker pull "$BASELINE"
+            python deploy/home-assistant/tools/recovery_smoke.py --image "$IMAGE" --baseline "$BASELINE"
+          else
+            python deploy/home-assistant/tools/recovery_smoke.py --image "$IMAGE" --baseline "$IMAGE"
+          fi
+          echo 'Pull request image passed smoke/recovery checks; it will not be published.'
   promote:
     needs: [select, build]
     if: needs.select.outputs.changed == 'true' && github.event_name != 'pull_request'
