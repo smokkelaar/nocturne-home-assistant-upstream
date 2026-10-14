@@ -53,14 +53,14 @@ source of truth.
 | Main | [![Main AMD64 build](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fmain%2Fconfig.json&query=%24.version&label=Main%20AMD64&color=orange)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/CHANGELOG.md) · [Image](https://github.com/users/smokkelaar/packages/container/package/nocturne-home-assistant-upstream%2Fnocturne-main-amd64) | [![Main ARM64 build](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmokkelaar%2Fnocturne-home-assistant-upstream%2Fhome-assistant%2Fmain%2Fconfig.json&query=%24.version&label=Main%20ARM64&color=orange)](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/CHANGELOG.md) · [Image](https://github.com/users/smokkelaar/packages/container/package/nocturne-home-assistant-upstream%2Fnocturne-main-aarch64) |
 
 Click a build badge for its published package information and upstream change links.
-During the fixed-main rollout both storage slots link to the exact fork-main
-source history. Their names preserve the existing installation identities. Image links show registry versions.
+Both storage slots use the same verified official Nightscout main snapshot,
+without Personal source changes. Their names preserve the existing installation identities. Image links show registry versions.
 Each channel publishes both architectures together only after every build and test
 passes; these badges show the last successfully published package.
 
 | Item | Stable | Main |
 | --- | --- | --- |
-| Nocturne source | Pinned fork-main snapshot during this rollout | Same pinned fork-main snapshot |
+| Nocturne source | Verified official main snapshot | Same official main snapshot |
 | Published version, source SHA and image digests | [Stable metadata](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/provenance.json) | [Main metadata](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/provenance.json) |
 | Installation | Prebuilt container | Prebuilt container |
 | Supported architecture | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/stable/config.json) | [Published architectures](https://github.com/smokkelaar/nocturne-home-assistant-upstream/blob/home-assistant/main/config.json) |
