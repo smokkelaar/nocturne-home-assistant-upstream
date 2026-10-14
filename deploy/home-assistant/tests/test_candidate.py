@@ -72,7 +72,7 @@ class PublicationReadinessTests(unittest.TestCase):
 
 
 class CandidateSelectionTests(unittest.TestCase):
-    def select(self, destination, paired, previous=None, registry_error=None, force=False):
+    def select(self, destination, paired, previous=None, registry_error=None, force=False, rollout=None):
         def github(path):
             return {
                 'releases/latest': {'draft': False, 'prerelease': False, 'tag_name': 'v0.2.4'},
@@ -94,7 +94,7 @@ class CandidateSelectionTests(unittest.TestCase):
                              side_effect=registry_error), \
                 patch.object(candidate.urllib.request, 'urlopen',
                              side_effect=lambda *args, **kwargs: io.BytesIO(b'PNPM_VERSION: 10.13.1')):
-            candidate.select(destination, 'example/wrapper', '0.2.101', WRAPPER, ['amd64'], force=force)
+            candidate.select(destination, 'example/wrapper', '0.2.101', WRAPPER, ['amd64'], force=force, main_rollout=rollout)
             return publisher
 
     def test_main_pending_does_not_block_ready_stable(self):
@@ -132,6 +132,34 @@ class CandidateSelectionTests(unittest.TestCase):
             self.assertEqual(publisher.call_args_list[1].args, (MAIN, 'main'))
             matrix = json.loads((Path(root) / 'matrix.json').read_text())
             self.assertEqual([item['channel'] for item in matrix['include']], ['stable', 'main'])
+
+    def test_pinned_main_rollout_uses_verified_fork_images_in_both_storage_slots(self):
+        rollout = {'repository': 'smokkelaar/nocturne-personal', 'commit': MAIN, 'commit_at': '2026-10-14T11:40:00Z'}
+        with tempfile.TemporaryDirectory() as root:
+            publisher = self.select(Path(root), [12, 13], rollout=rollout)
+            self.assertEqual([(MAIN, 'main', rollout['repository'])] * 2,
+                             [call.args for call in publisher.call_args_list])
+            for channel in ('stable', 'main'):
+                proof = json.loads((Path(root) / (channel + '.json')).read_text())
+                self.assertEqual(MAIN, proof['commit'])
+                self.assertEqual(rollout['repository'], proof['source_repository'])
+                self.assertIsNone(proof['links']['release_url'])
+                self.assertIn(rollout['repository'], proof['links']['source_url'])
+                recipe = (Path(root) / (channel + '-amd64') / 'Dockerfile').read_text()
+                self.assertIn('FROM ghcr.io/smokkelaar/nocturne-personal/nocturne-api@sha256:', recipe)
+                self.assertIn('FROM ghcr.io/smokkelaar/nocturne-personal/nocturne-web@sha256:', recipe)
+                runtime = json.loads((Path(root) / (channel + '-amd64') / 'rootfs/opt/nocturne-ha/version.json').read_text())
+                self.assertEqual(rollout['repository'], runtime['repository'])
+                self.assertEqual(rollout['commit_at'], runtime['commit_at'])
+                self.assertEqual('Nocturne fork main', runtime['base'])
+                self.assertEqual(proof['links']['source_url'], runtime['release_url'])
+                self.assertNotIn('0.2.7', runtime['release'])
+
+    def test_main_rollout_rejects_unpinned_or_unexpected_source(self):
+        for rollout in ({}, [], {'repository': 'smokkelaar/nocturne-personal', 'commit': 'main'},
+                        {'repository': 'other/fork', 'commit': MAIN}):
+            with tempfile.TemporaryDirectory() as root, self.assertRaises(ValueError):
+                self.select(Path(root), [], rollout=rollout)
 
     def test_pr_validation_requires_every_channel_and_platform(self):
         platforms = ['amd64', 'arm64']

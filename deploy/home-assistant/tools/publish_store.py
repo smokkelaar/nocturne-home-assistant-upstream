@@ -57,7 +57,7 @@ def publish(candidate, destination):
             f'[Source]({provenance["links"]["source_url"]})\n', encoding='utf-8')
     change_link = provenance['links']['release_url']
     changes = (f'[Nocturne release notes]({change_link})' if change_link else
-               f'Main is a source snapshot. [Nocturne commit history](https://github.com/nightscout/nocturne/commits/{provenance["commit"]}/)')
+               f'Main is a source snapshot. [Nocturne commit history](https://github.com/{provenance.get("source_repository", "nightscout/nocturne")}/commits/{provenance["commit"]}/)')
     (folder / 'CHANGELOG.md').write_text(
         f'# Nocturne {channel.title()} — HA package {version}\n\n'
         f'Nocturne version/source: `{provenance["upstream_tag"]}`.\n\n'

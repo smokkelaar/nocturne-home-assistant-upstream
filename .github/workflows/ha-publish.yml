@@ -48,7 +48,7 @@ jobs:
           if [ "$FORCE" = true ] || [ "$GITHUB_EVENT_NAME" = pull_request ]; then EXTRA+=(--force); fi
           PLATFORMS=$(python -c "import json; print(','.join(json.load(open('deploy/home-assistant/platforms.json'))))")
           python deploy/home-assistant/tools/check_locales.py --upstream
-          python deploy/home-assistant/tools/candidate.py --output work/candidates --repository "$REPOSITORY" --version "$VERSION" --commit "$COMMIT" --platforms "$PLATFORMS" "${EXTRA[@]}"
+          python deploy/home-assistant/tools/candidate.py --output work/candidates --repository "$REPOSITORY" --version "$VERSION" --commit "$COMMIT" --platforms "$PLATFORMS" --main-rollout deploy/home-assistant/main-rollout.json "${EXTRA[@]}"
           python - <<'PY'
           import json, os, sys
           sys.path.insert(0, 'deploy/home-assistant/tools')

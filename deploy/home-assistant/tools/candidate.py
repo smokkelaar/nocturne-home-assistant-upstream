@@ -1,5 +1,6 @@
 """Resolve paired upstream artifacts and assemble isolated build contexts."""
 import argparse
+from datetime import datetime
 import hashlib
 import json
 import os
@@ -69,14 +70,16 @@ def registry(repository, reference, arch, revision=None, labels=None):
     return digest
 
 
-def paired_run(commit, branch=None):
+def paired_run(commit, branch=None, repository=UPSTREAM):
     suffix = f'&branch={branch}' if branch else ''
-    runs = github('actions/workflows/docker-publish.yml/runs?per_page=50&head_sha=' + commit + suffix)
+    def source_github(path):
+        return github(path) if repository == UPSTREAM else github(path, repository)
+    runs = source_github('actions/workflows/docker-publish.yml/runs?per_page=50&head_sha=' + commit + suffix)
     matching = [run for run in runs['workflow_runs'] if run.get('head_sha') == commit]
     for run in matching:
         if run.get('conclusion') != 'success':
             continue
-        jobs = github(f"actions/runs/{run['id']}/jobs?per_page=100")['jobs']
+        jobs = source_github(f"actions/runs/{run['id']}/jobs?per_page=100")['jobs']
         names = {j['name']: j['conclusion'] for j in jobs}
         if names.get('build-and-push') == 'success' or all(names.get(k) == 'success'
                 for k in ('dotnet-images', 'web-image', 'report')):
@@ -95,14 +98,14 @@ def recipe_hash():
     return digest.hexdigest()
 
 
-def links(commit, release, wrapper_repository, wrapper_commit, workflow_run):
+def links(commit, release, wrapper_repository, wrapper_commit, workflow_run, source_repository=UPSTREAM):
     if not re.fullmatch(r'[0-9a-f]{40}', commit) or not re.fullmatch(r'[0-9a-f]{40}', wrapper_commit):
         raise ValueError('Source links require full commit SHAs')
     return {
-        'source_url': f'https://github.com/{UPSTREAM}/tree/{commit}',
-        'release_url': f'https://github.com/{UPSTREAM}/releases/tag/{release}' if release else None,
+        'source_url': f'https://github.com/{source_repository}/tree/{commit}',
+        'release_url': f'https://github.com/{source_repository}/releases/tag/{release}' if release else None,
         'wrapper_url': f'https://github.com/{wrapper_repository}/tree/{wrapper_commit}/deploy/home-assistant',
-        'build_url': f'https://github.com/{UPSTREAM}/actions/runs/{workflow_run}',
+        'build_url': f'https://github.com/{source_repository}/actions/runs/{workflow_run}',
     }
 
 
@@ -143,23 +146,35 @@ def require_complete_pr_matrix(matrix, deferred, platforms):
         raise ValueError('PR validation requires every Stable/Main image; ' + '; '.join(details))
 
 
-def select(destination, owner_repo, version, wrapper_commit, platforms, force=False):
+def select(destination, owner_repo, version, wrapper_commit, platforms, force=False, main_rollout=None):
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', owner_repo):
         raise ValueError('Invalid repository')
     require_upgrade(version)
-    release = github('releases/latest')
-    if release['draft'] or release['prerelease'] or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', release['tag_name']):
+    source_repository = UPSTREAM
+    rollout_enabled = main_rollout is not None
+    if rollout_enabled:
+        if not isinstance(main_rollout, dict) or not {'repository', 'commit', 'commit_at'} <= main_rollout.keys():
+            raise ValueError('Main rollout requires repository, commit and commit_at')
+        source_repository = main_rollout['repository']
+        if source_repository != 'smokkelaar/nocturne-personal' or not isinstance(main_rollout['commit'], str) or not re.fullmatch('[0-9a-f]{40}', main_rollout['commit']):
+            raise ValueError('Main rollout must identify the maintained fork and an exact commit')
+        if not isinstance(main_rollout['commit_at'], str) or datetime.fromisoformat(main_rollout['commit_at'].replace('Z', '+00:00')).tzinfo is None:
+            raise ValueError('Main rollout source timestamp must include timezone')
+    release = github('releases/latest') if not rollout_enabled else None
+    if release and (release['draft'] or release['prerelease'] or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', release['tag_name'])):
         raise ValueError('Stable requires a regular published release')
-    stable_commit = github('commits/' + release['tag_name'])['sha']
+    stable_commit = github('commits/' + release['tag_name'])['sha'] if not main_rollout else main_rollout['commit']
     # Resolve the branch first: a paginated run list can omit the current build.
     # paired_run below requires successful images for this exact source revision.
     # If its publisher is still running, leave the existing store intact and retry.
-    main_commit = github('commits/main')['sha']
+    main_commit = github('commits/main')['sha'] if not main_rollout else main_rollout['commit']
     recipe = recipe_hash()
     matrix = []
     deferred = []
-    for channel, commit, tag in [('stable', stable_commit, release['tag_name'][1:]),
+    for channel, commit, tag in [('stable', stable_commit, release['tag_name'][1:] if release else 'main-' + stable_commit[:7]),
                                  ('main', main_commit, 'main-' + main_commit[:7])]:
+        if main_rollout:
+            tag = 'main-' + commit[:7]
         previous = None
         try:
             previous = fetch(f'https://raw.githubusercontent.com/{owner_repo}/home-assistant/{channel}/provenance.json')[0]
@@ -169,28 +184,30 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
         if not force and previous and previous['commit'] == commit and previous['recipe'] == recipe and previous['platforms'] == platforms:
             continue
         try:
-            run_id = paired_run(commit, 'main' if channel == 'main' else None)
+            run_id = (paired_run(commit, 'main', source_repository) if main_rollout
+                      else paired_run(commit, 'main' if channel == 'main' else None))
         except UpstreamNotReady as error:
             deferred.append({'channel': channel, 'commit': commit, 'reason': str(error)})
             print(f'::notice title=Upstream publication pending::{channel}: {error}; retry on the next scheduled run.')
             continue
         published = previous_package(owner_repo, channel)
         require_upgrade(version, published['version'] if published else None)
-        refs = links(commit, release['tag_name'] if channel == 'stable' else None,
-                     owner_repo, wrapper_commit, run_id)
+        refs = links(commit, release['tag_name'] if channel == 'stable' and not main_rollout else None,
+                     owner_repo, wrapper_commit, run_id, source_repository)
         provenance = {'channel': channel, 'commit': commit, 'upstream_tag': tag,
                       'upstream_run': run_id, 'recipe': recipe, 'version': version,
                       'wrapper_commit': wrapper_commit, 'repository': owner_repo,
                       'platforms': platforms, 'links': refs,
                       'baseline_image': previous.get('image') if previous else None, 'images': {}}
-        request = urllib.request.Request(f'https://raw.githubusercontent.com/{UPSTREAM}/{commit}/.github/workflows/docker-publish.yml', headers={'User-Agent': 'nocturne-ha-publisher'})
+        provenance['source_repository'] = source_repository
+        request = urllib.request.Request(f'https://raw.githubusercontent.com/{source_repository}/{commit}/.github/workflows/docker-publish.yml', headers={'User-Agent': 'nocturne-ha-publisher'})
         with urllib.request.urlopen(request, timeout=30) as response:
             workflow = response.read(200_000).decode('utf-8')
         pnpm = re.search(r'PNPM_VERSION: [\"\']?([0-9]+\.[0-9]+\.[0-9]+)', workflow)
         if not pnpm:
             raise ValueError('Upstream must declare a pinned PNPM_VERSION')
         for arch in platforms:
-            pins = {kind: registry(f'{UPSTREAM}/nocturne-{kind}', tag, arch,
+            pins = {kind: registry(f'{source_repository}/nocturne-{kind}', tag, arch,
                                   commit if kind == 'api' else None) for kind in ('api', 'web')}
             provenance['images'][arch] = pins
             context = destination / f'{channel}-{arch}'
@@ -199,17 +216,24 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             dockerfile = (BASE / 'shared/Dockerfile.in').read_text().replace('{{PNPM_VERSION}}', pnpm[1])
             for kind, pin in pins.items():
                 dockerfile = re.sub(rf'FROM ghcr.io/nightscout/nocturne/nocturne-{kind}@sha256:[0-9a-f]{{64}}',
-                                   f'FROM ghcr.io/{UPSTREAM}/nocturne-{kind}@{pin}', dockerfile)
+                                   f'FROM ghcr.io/{source_repository}/nocturne-{kind}@{pin}', dockerfile)
             dockerfile = re.sub(r'ARG BUILD_VERSION=\S+', 'ARG BUILD_VERSION=' + version, dockerfile)
             dockerfile = re.sub(r'ARG BUILD_ARCH=\S+', 'ARG BUILD_ARCH=' + ('aarch64' if arch == 'arm64' else arch), dockerfile)
             dockerfile = dockerfile.replace('https://github.com/smokkelaar/nocturne-home-assistant',
                                             'https://github.com/' + owner_repo)
             (context / 'Dockerfile').write_text(dockerfile, encoding='utf-8')
             metadata = json.loads((context / 'rootfs/opt/nocturne-ha/version.json').read_text())
-            metadata.update(app='0.2.0', package=version, nocturne=tag if channel == 'stable' else 'main@' + commit[:7],
+            metadata.update(app='0.2.0', package=version, nocturne=tag if channel == 'stable' and not main_rollout else 'main@' + commit[:7],
                             source_commit=commit, base_commit=commit, channel=channel, links=refs,
                             name='Nocturne ' + channel.title(), default_public_url='https://homeassistant.local:' + ('8448' if channel == 'stable' else '8449'),
                             cookie_namespace='NocturneOfficial_' if channel == 'stable' else 'NocturneLatest_')
+            metadata['source_repository'] = source_repository
+            if rollout_enabled:
+                metadata.update(repository=source_repository, commit_at=main_rollout['commit_at'],
+                                base='Nocturne fork main', release='Fork main ' + commit[:7],
+                                release_url=refs['source_url'],
+                                purpose='Use pinned main with the temporary basal serialization fix.',
+                                purpose_url=refs['source_url'], test_url=refs['build_url'])
             write(context / 'rootfs/opt/nocturne-ha/version.json', metadata)
             matrix.append({'channel': channel, 'arch': arch,
                            'hass_arch': 'aarch64' if arch == 'arm64' else arch,
@@ -228,8 +252,10 @@ if __name__ == '__main__':
     parser.add_argument('--commit', required=True)
     parser.add_argument('--platforms', default='amd64')
     parser.add_argument('--force', action='store_true')
+    parser.add_argument('--main-rollout', type=Path)
     args = parser.parse_args()
     platforms = args.platforms.split(',')
     if not platforms or any(p not in ('amd64', 'arm64') for p in platforms) or len(set(platforms)) != len(platforms):
         raise SystemExit('Unsupported platforms')
-    select(args.output, args.repository, args.version, args.commit, platforms, args.force)
+    rollout = json.loads(args.main_rollout.read_text()) if args.main_rollout else None
+    select(args.output, args.repository, args.version, args.commit, platforms, args.force, rollout)
