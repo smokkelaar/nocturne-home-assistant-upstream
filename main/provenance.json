@@ -3,9 +3,9 @@
   "commit": "613c5f10423a0f1f0ea7777598229ab62705014a",
   "upstream_tag": "main-613c5f1",
   "upstream_run": 38558082323,
-  "recipe": "bfaa187efd4fbb6c4b2f9e98964beed383c9e60b2e61de3bbbf564a46b010807",
-  "version": "0.2.29001",
-  "wrapper_commit": "3cf461d87390a32cd1eb77699a654a0ee1ecb747",
+  "recipe": "b206efbe0c92cb91d9a0285ff0072ef18304299fd2d005cb159831e0572ae780",
+  "version": "0.2.30001",
+  "wrapper_commit": "7203399697b54b4bfbec694a105045635f7e5d91",
   "repository": "smokkelaar/nocturne-home-assistant-upstream",
   "platforms": [
     "amd64",
@@ -14,10 +14,10 @@
   "links": {
     "source_url": "https://github.com/smokkelaar/nocturne-personal/tree/613c5f10423a0f1f0ea7777598229ab62705014a",
     "release_url": null,
-    "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/3cf461d87390a32cd1eb77699a654a0ee1ecb747/deploy/home-assistant",
+    "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/7203399697b54b4bfbec694a105045635f7e5d91/deploy/home-assistant",
     "build_url": "https://github.com/smokkelaar/nocturne-personal/actions/runs/38558082323"
   },
-  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.27601",
+  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.29001",
   "images": {
     "amd64": {
       "api": "sha256:434fe2d9d684d7422060a0eabf959a72a920f10cf384acb0c685ad5dde5e9800",
@@ -29,9 +29,9 @@
     }
   },
   "source_repository": "smokkelaar/nocturne-personal",
-  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.29001",
+  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.30001",
   "digests": {
-    "amd64": "sha256:0436e059ccfdb8158fd7fd5a01d8f7a5095dc1094d8d4914d58b7f832bc446df",
-    "aarch64": "sha256:47b9ac20416c50654a1b8c6877796d4886a379bcbecd6904bbade590a3792a5f"
+    "amd64": "sha256:cf5a480709f639829c4c0e39abef6594434f7a779ed73d4a3f933e12203e1c68",
+    "aarch64": "sha256:9d17e56baf97544de827a6709d62268e1fdbcf9eac2d6a15074ceb35bee17afc"
   }
 }
