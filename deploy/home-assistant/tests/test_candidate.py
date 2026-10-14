@@ -154,6 +154,8 @@ class CandidateSelectionTests(unittest.TestCase):
                 self.assertEqual('Nocturne fork main', runtime['base'])
                 self.assertEqual(proof['links']['source_url'], runtime['release_url'])
                 self.assertNotIn('0.2.7', runtime['release'])
+                self.assertEqual('NocturneStable_' if channel == 'stable' else 'NocturneMain_',
+                                 runtime['cookie_namespace'])
 
     def test_main_rollout_rejects_unpinned_or_unexpected_source(self):
         for rollout in ({}, [], {'repository': 'smokkelaar/nocturne-personal', 'commit': 'main'},

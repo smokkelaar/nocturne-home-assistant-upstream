@@ -161,6 +161,10 @@ def main():
                         namespace = options['cookie_namespace']
                         body = check(protected, '', 'web', cookie=(
                             f'{namespace}.Nocturne.AccessToken=fixture-cookie; '
+                            'NocturneOfficial_.Nocturne.AccessToken=foreign-official; '
+                            'NocturneLatest_.Nocturne.AccessToken=foreign-latest; '
+                            'NocturnePersonal_.Nocturne.AccessToken=foreign-personal; '
+                            'NocturneTestA_.Nocturne.AccessToken=foreign-test; '
                             'NocturneOther_.Nocturne.AccessToken=foreign; '
                             '.Nocturne.AccessToken=old-unscoped; IsAuthenticated=true'))
                         assert body['cookie'] == '.Nocturne.AccessToken=fixture-cookie'

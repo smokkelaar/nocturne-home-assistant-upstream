@@ -226,7 +226,7 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             metadata.update(app='0.2.0', package=version, nocturne=tag if channel == 'stable' and not main_rollout else 'main@' + commit[:7],
                             source_commit=commit, base_commit=commit, channel=channel, links=refs,
                             name='Nocturne ' + channel.title(), default_public_url='https://homeassistant.local:' + ('8448' if channel == 'stable' else '8449'),
-                            cookie_namespace='NocturneOfficial_' if channel == 'stable' else 'NocturneLatest_')
+                            cookie_namespace='NocturneStable_' if channel == 'stable' else 'NocturneMain_')
             metadata['source_repository'] = source_repository
             if rollout_enabled:
                 metadata.update(repository=source_repository, commit_at=main_rollout['commit_at'],

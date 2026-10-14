@@ -14,7 +14,7 @@ SECRET_FIELDS = ('instance', 'postgres', 'migrator', 'app', 'web', 'gateway')
 def validate_options(options):
     versions = json.loads(Path(__file__).with_name('version.json').read_text())
     cookie_namespace = versions['cookie_namespace']
-    if cookie_namespace not in ('NocturneOfficial_', 'NocturneLatest_'):
+    if cookie_namespace not in ('NocturneStable_', 'NocturneMain_'):
         raise ValueError('Ongeldige cookieruimte in pakketmetadata')
     public_url = options.get('public_url', versions['default_public_url']).rstrip('/')
     if any(c.isspace() for c in public_url):
@@ -126,7 +126,7 @@ def nginx_config(options, cert_path, key_path):
         # Nocturne still validates their signature, expiry, tenant and scopes.
         oauth_rule = '"~*^Bearer [A-Za-z0-9._~+/-]+=*$" $http_authorization;'
     namespace = options['cookie_namespace']
-    if namespace not in ('NocturneOfficial_', 'NocturneLatest_'):
+    if namespace not in ('NocturneStable_', 'NocturneMain_'):
         raise ValueError('Ongeldige cookieruimte')
     tenant_pattern = '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.' + re.escape(options['hostname'])
     return f'''load_module /usr/lib/nginx/modules/ngx_http_js_module.so;
