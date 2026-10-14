@@ -1,5 +1,6 @@
 """Resolve paired upstream artifacts and assemble isolated build contexts."""
 import argparse
+from datetime import datetime
 import hashlib
 import json
 import os
@@ -150,11 +151,16 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
         raise ValueError('Invalid repository')
     require_upgrade(version)
     source_repository = UPSTREAM
-    if main_rollout:
+    rollout_enabled = main_rollout is not None
+    if rollout_enabled:
+        if not isinstance(main_rollout, dict) or not {'repository', 'commit', 'commit_at'} <= main_rollout.keys():
+            raise ValueError('Main rollout requires repository, commit and commit_at')
         source_repository = main_rollout['repository']
-        if source_repository != 'smokkelaar/nocturne-personal' or not re.fullmatch('[0-9a-f]{40}', main_rollout['commit']):
+        if source_repository != 'smokkelaar/nocturne-personal' or not isinstance(main_rollout['commit'], str) or not re.fullmatch('[0-9a-f]{40}', main_rollout['commit']):
             raise ValueError('Main rollout must identify the maintained fork and an exact commit')
-    release = github('releases/latest') if not main_rollout else None
+        if not isinstance(main_rollout['commit_at'], str) or datetime.fromisoformat(main_rollout['commit_at'].replace('Z', '+00:00')).tzinfo is None:
+            raise ValueError('Main rollout source timestamp must include timezone')
+    release = github('releases/latest') if not rollout_enabled else None
     if release and (release['draft'] or release['prerelease'] or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', release['tag_name'])):
         raise ValueError('Stable requires a regular published release')
     stable_commit = github('commits/' + release['tag_name'])['sha'] if not main_rollout else main_rollout['commit']
@@ -222,6 +228,12 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
                             name='Nocturne ' + channel.title(), default_public_url='https://homeassistant.local:' + ('8448' if channel == 'stable' else '8449'),
                             cookie_namespace='NocturneOfficial_' if channel == 'stable' else 'NocturneLatest_')
             metadata['source_repository'] = source_repository
+            if rollout_enabled:
+                metadata.update(repository=source_repository, commit_at=main_rollout['commit_at'],
+                                base='Nocturne fork main', release='Fork main ' + commit[:7],
+                                release_url=refs['source_url'],
+                                purpose='Use pinned main with the temporary basal serialization fix.',
+                                purpose_url=refs['source_url'], test_url=refs['build_url'])
             write(context / 'rootfs/opt/nocturne-ha/version.json', metadata)
             matrix.append({'channel': channel, 'arch': arch,
                            'hass_arch': 'aarch64' if arch == 'arm64' else arch,
