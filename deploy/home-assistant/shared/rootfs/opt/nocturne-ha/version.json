@@ -14,5 +14,5 @@
   "test_url": "https://github.com/nightscout/nocturne/releases/tag/v0.2.7",
   "name": "Nocturne Official Release",
   "default_public_url": "https://homeassistant.local:8448",
-  "cookie_namespace": "NocturneOfficial_"
+  "cookie_namespace": "NocturneStable_"
 }

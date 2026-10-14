@@ -31,6 +31,12 @@ Test A/B/C builds are not automatically included in Stable or Main.
 Stable and Main include a read-only in-container `nocturne-ha` diagnostic CLI.
 See [usage and safety boundaries](deploy/home-assistant/CLI.md).
 
+Main and Stable use separate session cookie names (`NocturneMain_` and
+`NocturneStable_`), including when installed alongside Latest, Official, Personal,
+and Test apps on the same hostname. Browser cookies are shared across ports.
+Upgrading from the old shared names requires signing in once again to Main and
+Stable; existing data and the sessions of the other apps are preserved.
+
 ## At a glance
 
 The version badges read the **published `home-assistant` branch**, so they update

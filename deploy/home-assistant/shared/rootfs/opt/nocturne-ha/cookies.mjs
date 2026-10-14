@@ -1,6 +1,7 @@
 // Browser-facing cookie isolation. Internal Web/API traffic keeps upstream names.
 // No cookie values, headers, or credentials may be logged from this module.
-const PREFIXES = ['NocturneOfficial_', 'NocturneLatest_'];
+// Ports do not isolate browser cookies; Main/Stable must also differ from Official/Latest.
+const PREFIXES = ['NocturneStable_', 'NocturneMain_'];
 // These client-written display preferences have no authentication authority.
 // Keeping them unchanged avoids modifying/cache-busting upstream JS bundles.
 const PREFERENCES = ['nocturne-language', 'nocturne-prefs', 'sidebar:state'];
