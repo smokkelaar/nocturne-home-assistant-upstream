@@ -108,9 +108,9 @@ a security audit. The actual rating and protection/AppArmor state are shown by
 Supervisor and can depend on local settings. Real HAOS and live-provider checks
 remain in the [acceptance checklist](docs/ACCEPTANCE.md).
 
-## Fixed main rollout
+## Official main rollout
 
-The deployment pins both existing Stable and Main storage slots to the tested fork-main source in `deploy/home-assistant/main-rollout.json`, including the temporary-basal serialization fix. The Stable slot runs a main snapshot during this rollout. Ports, data identities and cookie namespaces remain separate; runtime metadata and published provenance identify the exact source.
+The deployment pins both existing Stable and Main storage slots to the verified official `nightscout/nocturne` main image pair in `deploy/home-assistant/main-rollout.json`, without Personal changes or an extra treatment patch. The Stable slot runs that same main snapshot during this rollout. Ports, data identities and cookie namespaces remain separate; runtime metadata and published provenance identify the exact source.
 
 ## Install
 
