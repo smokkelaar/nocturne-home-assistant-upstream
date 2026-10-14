@@ -1,14 +1,14 @@
-# Nocturne Stable — HA package 0.2.10201
+# Nocturne Stable — HA package 0.2.29001
 
-Nocturne version/source: `0.2.7`.
+Nocturne version/source: `main-613c5f1`.
 
 Published architectures: amd64, aarch64. Both use the same Nocturne source.
 
-[Nocturne release notes](https://github.com/nightscout/nocturne/releases/tag/v0.2.7)
+Main is a source snapshot. [Nocturne commit history](https://github.com/smokkelaar/nocturne-personal/commits/613c5f10423a0f1f0ea7777598229ab62705014a/)
 
-- [Exact Nocturne source](https://github.com/nightscout/nocturne/tree/d9e1430975c7a05967cba66374392f75f08c858f)
-- [HA wrapper source](https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/f84891d007dd23f8ad8a107d54331f56d1bd54af/deploy/home-assistant)
-- [Upstream image build](https://github.com/nightscout/nocturne/actions/runs/34594063064)
+- [Exact Nocturne source](https://github.com/smokkelaar/nocturne-personal/tree/613c5f10423a0f1f0ea7777598229ab62705014a)
+- [HA wrapper source](https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/3cf461d87390a32cd1eb77699a654a0ee1ecb747/deploy/home-assistant)
+- [Upstream image build](https://github.com/smokkelaar/nocturne-personal/actions/runs/38558082323)
 - [Package provenance and image digests](provenance.json)
 
 HA package and Nocturne version numbers are separate. Publication requires native runtime, setup and recovery tests and anonymous registry verification.
