@@ -133,8 +133,8 @@ class CandidateSelectionTests(unittest.TestCase):
             matrix = json.loads((Path(root) / 'matrix.json').read_text())
             self.assertEqual([item['channel'] for item in matrix['include']], ['stable', 'main'])
 
-    def test_pinned_main_rollout_uses_verified_fork_images_in_both_storage_slots(self):
-        rollout = {'repository': 'smokkelaar/nocturne-personal', 'commit': MAIN, 'commit_at': '2026-10-14T11:40:00Z'}
+    def test_pinned_main_rollout_uses_verified_official_images_in_both_storage_slots(self):
+        rollout = {'repository': 'nightscout/nocturne', 'commit': MAIN, 'commit_at': '2026-10-14T11:40:00Z'}
         with tempfile.TemporaryDirectory() as root:
             publisher = self.select(Path(root), [12, 13], rollout=rollout)
             self.assertEqual([(MAIN, 'main', rollout['repository'])] * 2,
@@ -146,12 +146,12 @@ class CandidateSelectionTests(unittest.TestCase):
                 self.assertIsNone(proof['links']['release_url'])
                 self.assertIn(rollout['repository'], proof['links']['source_url'])
                 recipe = (Path(root) / (channel + '-amd64') / 'Dockerfile').read_text()
-                self.assertIn('FROM ghcr.io/smokkelaar/nocturne-personal/nocturne-api@sha256:', recipe)
-                self.assertIn('FROM ghcr.io/smokkelaar/nocturne-personal/nocturne-web@sha256:', recipe)
+                self.assertIn('FROM ghcr.io/nightscout/nocturne/nocturne-api@sha256:', recipe)
+                self.assertIn('FROM ghcr.io/nightscout/nocturne/nocturne-web@sha256:', recipe)
                 runtime = json.loads((Path(root) / (channel + '-amd64') / 'rootfs/opt/nocturne-ha/version.json').read_text())
                 self.assertEqual(rollout['repository'], runtime['repository'])
                 self.assertEqual(rollout['commit_at'], runtime['commit_at'])
-                self.assertEqual('Nocturne fork main', runtime['base'])
+                self.assertEqual('Nocturne main', runtime['base'])
                 self.assertEqual(proof['links']['source_url'], runtime['release_url'])
                 self.assertNotIn('0.2.7', runtime['release'])
                 self.assertEqual('NocturneStable_' if channel == 'stable' else 'NocturneMain_',
@@ -159,7 +159,8 @@ class CandidateSelectionTests(unittest.TestCase):
 
     def test_main_rollout_rejects_unpinned_or_unexpected_source(self):
         for rollout in ({}, [], {'repository': 'smokkelaar/nocturne-personal', 'commit': 'main'},
-                        {'repository': 'other/fork', 'commit': MAIN}):
+                        {'repository': 'other/fork', 'commit': MAIN},
+                        {'repository': 'smokkelaar/nocturne-personal', 'commit': MAIN, 'commit_at': '2026-10-14T11:40:00Z'}):
             with tempfile.TemporaryDirectory() as root, self.assertRaises(ValueError):
                 self.select(Path(root), [], rollout=rollout)
 

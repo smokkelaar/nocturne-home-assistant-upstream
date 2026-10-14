@@ -156,8 +156,8 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
         if not isinstance(main_rollout, dict) or not {'repository', 'commit', 'commit_at'} <= main_rollout.keys():
             raise ValueError('Main rollout requires repository, commit and commit_at')
         source_repository = main_rollout['repository']
-        if source_repository != 'smokkelaar/nocturne-personal' or not isinstance(main_rollout['commit'], str) or not re.fullmatch('[0-9a-f]{40}', main_rollout['commit']):
-            raise ValueError('Main rollout must identify the maintained fork and an exact commit')
+        if source_repository != UPSTREAM or not isinstance(main_rollout['commit'], str) or not re.fullmatch('[0-9a-f]{40}', main_rollout['commit']):
+            raise ValueError('Main rollout must identify official Nightscout upstream and an exact commit')
         if not isinstance(main_rollout['commit_at'], str) or datetime.fromisoformat(main_rollout['commit_at'].replace('Z', '+00:00')).tzinfo is None:
             raise ValueError('Main rollout source timestamp must include timezone')
     release = github('releases/latest') if not rollout_enabled else None
@@ -230,9 +230,9 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             metadata['source_repository'] = source_repository
             if rollout_enabled:
                 metadata.update(repository=source_repository, commit_at=main_rollout['commit_at'],
-                                base='Nocturne fork main', release='Fork main ' + commit[:7],
+                                base='Nocturne main', release='Official main ' + commit[:7],
                                 release_url=refs['source_url'],
-                                purpose='Use pinned main with the temporary basal serialization fix.',
+                                purpose='Use the verified official Nightscout main build without Personal changes.',
                                 purpose_url=refs['source_url'], test_url=refs['build_url'])
             write(context / 'rootfs/opt/nocturne-ha/version.json', metadata)
             matrix.append({'channel': channel, 'arch': arch,
