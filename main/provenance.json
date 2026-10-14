@@ -1,10 +1,10 @@
 {
   "channel": "main",
-  "commit": "b50f549fb7e0b34d299fa6ccc181652cf21be676",
-  "upstream_tag": "main-b50f549",
-  "upstream_run": 38193195357,
+  "commit": "63949ab21c9d4957a9aa065d30e9b448b1d95c7d",
+  "upstream_tag": "main-63949ab",
+  "upstream_run": 38486049786,
   "recipe": "7ab34e8675b018f703ae78e26463684fc0930e5024a023137b854cbcb394f7ea",
-  "version": "0.2.22901",
+  "version": "0.2.27601",
   "wrapper_commit": "37b295cc50dca96ae357da89387d4f4342e8fd51",
   "repository": "smokkelaar/nocturne-home-assistant-upstream",
   "platforms": [
@@ -12,25 +12,25 @@
     "arm64"
   ],
   "links": {
-    "source_url": "https://github.com/nightscout/nocturne/tree/b50f549fb7e0b34d299fa6ccc181652cf21be676",
+    "source_url": "https://github.com/nightscout/nocturne/tree/63949ab21c9d4957a9aa065d30e9b448b1d95c7d",
     "release_url": null,
     "wrapper_url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream/tree/37b295cc50dca96ae357da89387d4f4342e8fd51/deploy/home-assistant",
-    "build_url": "https://github.com/nightscout/nocturne/actions/runs/38193195357"
+    "build_url": "https://github.com/nightscout/nocturne/actions/runs/38486049786"
   },
-  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.22501",
+  "baseline_image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.22901",
   "images": {
     "amd64": {
-      "api": "sha256:0bcaa51c480b4668c9171a2b0a67bf806996557d6333c3b54f1c6e25d095f7bd",
-      "web": "sha256:b58e88d66696284e47f8b0b846495b69f42a64c38ebda51aeb0eec86d82c6e42"
+      "api": "sha256:7cbc1dbf7430ea5652d15ab85353060e10e0c520aad38a2603054e1bb2b45e04",
+      "web": "sha256:64c4d66ae0b014310a81f677ecb1676a1eb05177f0f8929b625efbe254272dfb"
     },
     "arm64": {
-      "api": "sha256:1cc628d0f7a72968a6364209a8cd5827179e27da297300d08b4c6404e4fc2c89",
-      "web": "sha256:608c323adb344f5baeeadc9b2008287798da5c7c65bf50a1142eaf9adfa54681"
+      "api": "sha256:29ab91a85bae5ecfc7fa00924081464bf234f4332a72e7a30413761957c86074",
+      "web": "sha256:1455e9fbace52e9e763854d91dbf0f545907ef6cfeb991973eda3d471981c9df"
     }
   },
-  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.22901",
+  "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}:0.2.27601",
   "digests": {
-    "amd64": "sha256:379d26f69f0cebbbf85b0db4f86486506a7d14f0d53db2f15016eb9889aa3e95",
-    "aarch64": "sha256:fe32c4f24d0d17d632836696eecc43eeb8cac7bd1edd80b9275b3ecdb8f3b26b"
+    "amd64": "sha256:268c3f4effa971da7d6e1a7a3f9e3ece71ff1b47e7fd3e66ad1dda7ada4e8151",
+    "aarch64": "sha256:e1f8979e66f421e8fdd98aec22694a5ffa244ecf5fee6e28e50cf267e59f5c16"
   }
 }
