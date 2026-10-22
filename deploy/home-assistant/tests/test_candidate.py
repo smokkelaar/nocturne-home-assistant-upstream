@@ -21,10 +21,24 @@ class PublicationReadinessTests(unittest.TestCase):
 
     def paired(self, runs, jobs=()):
         def github(path):
+            if path == 'actions/workflows/docker-publish.yml':
+                return {'id': 123}
             if '/runs?' in path:
                 return {'workflow_runs': runs}
             return {'jobs': [{'name': name, 'conclusion': result} for name, result in jobs]}
         return patch.object(candidate, 'github', side_effect=github)
+
+    def test_publisher_lookup_uses_numeric_workflow_id(self):
+        with self.paired([self.run_record()], [('build-and-push', 'success')]) as api:
+            self.assertEqual(candidate.paired_run(MAIN, 'main'), 12)
+            self.assertIn('actions/workflows/123/runs?per_page=50&head_sha=' + MAIN + '&branch=main',
+                          [call.args[0] for call in api.call_args_list])
+
+    def test_invalid_publisher_id_fails_closed(self):
+        for value in (None, '123', True, 0):
+            with self.subTest(value=value), patch.object(candidate, 'github', return_value={'id': value}):
+                with self.assertRaises(ValueError):
+                    candidate.paired_run(MAIN)
 
     def test_missing_or_unrelated_run_is_deferred(self):
         for runs in ([], [self.run_record(commit=STABLE)]):

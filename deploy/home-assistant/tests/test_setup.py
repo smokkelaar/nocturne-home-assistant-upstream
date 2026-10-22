@@ -108,8 +108,8 @@ class SetupTests(unittest.TestCase):
                 responses[2].getresponse.return_value.read.assert_not_called()
 
     def test_paired_run_rejects_success_for_other_source_revision(self):
-        with patch('candidate.github', return_value={'workflow_runs': [
-                {'head_sha': 'old', 'conclusion': 'success', 'id': 1}]}):
+        with patch('candidate.github', side_effect=[{'id': 123}, {'workflow_runs': [
+                {'head_sha': 'old', 'conclusion': 'success', 'id': 1}]}]):
             with self.assertRaisesRegex(UpstreamNotReady, 'Upstream publication has not completed'):
                 paired_run('current', 'main')
 
@@ -118,7 +118,7 @@ class SetupTests(unittest.TestCase):
         for web_result in ['failure', 'success']:
             jobs = {'jobs': [{'name': name, 'conclusion': result} for name, result in
                     [('dotnet-images', 'success'), ('web-image', web_result), ('report', 'success')]]}
-            with patch('candidate.github', side_effect=[listing, jobs]):
+            with patch('candidate.github', side_effect=[{'id': 123}, listing, jobs]):
                 if web_result == 'success':
                     self.assertEqual(paired_run('current', 'main'), 1)
                 else:
