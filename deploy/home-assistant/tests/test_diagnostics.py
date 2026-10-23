@@ -42,7 +42,8 @@ class DiagnosticTests(unittest.TestCase):
         self.assertIn("execute(name, API_ENV_PROBE, user='app')",
                       (BASE / 'tools/smoke.py').read_text())
         self.assertIn("process_environment.get(b'ASPNETCORE_URLS')", smoke.API_ENV_PROBE)
-        self.assertIn('/api/v3/version', configured_probe)
+        self.assertIn('/api/v1/status', configured_probe)
+        self.assertNotIn('/api/v3/version', configured_probe)
         self.assertIn("version['head'] == expected_metadata['GIT_COMMIT']", configured_probe)
         self.assertIn("version['build'] == expected_metadata['BUILD_DATE']", configured_probe)
         self.assertIn("raise ConnectionError('Web service is not ready')", probe)

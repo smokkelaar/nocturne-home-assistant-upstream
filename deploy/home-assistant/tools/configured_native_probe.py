@@ -17,12 +17,12 @@ try:
     run.verify_native_auth(options)  # Real upstream status + authorization, no mocks.
     assert run.web_response_reachable(options)
 
-    # The v3 version endpoint is tenant-routed; check it after the disposable tenant exists.
+    # Build provenance is exposed by v1 status; v3 version contains API/storage versions.
     phase = 'VERSION_METADATA'
     metadata = json.loads(Path('/opt/nocturne-ha/version.json').read_text())
     expected_metadata = settings.api_build_metadata(metadata)
     version_request = urllib.request.Request(
-        'http://127.0.0.1:8080/api/v3/version',
+        'http://127.0.0.1:8080/api/v1/status',
         headers={'Host': options['authority'], 'X-Forwarded-Host': options['authority'],
                  'X-Forwarded-Proto': 'https', 'Accept': 'application/json'})
     with urllib.request.urlopen(version_request, timeout=10) as response:

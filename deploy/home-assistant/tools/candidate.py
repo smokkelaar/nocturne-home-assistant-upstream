@@ -74,7 +74,11 @@ def paired_run(commit, branch=None, repository=UPSTREAM):
     suffix = f'&branch={branch}' if branch else ''
     def source_github(path):
         return github(path) if repository == UPSTREAM else github(path, repository)
-    runs = source_github('actions/workflows/docker-publish.yml/runs?per_page=50&head_sha=' + commit + suffix)
+    workflow = source_github('actions/workflows/docker-publish.yml')
+    workflow_id = workflow.get('id')
+    if not isinstance(workflow_id, int) or isinstance(workflow_id, bool) or workflow_id <= 0:
+        raise ValueError('Invalid upstream publisher workflow ID')
+    runs = source_github(f'actions/workflows/{workflow_id}/runs?per_page=50&head_sha=' + commit + suffix)
     matching = [run for run in runs['workflow_runs'] if run.get('head_sha') == commit]
     for run in matching:
         if run.get('conclusion') != 'success':
