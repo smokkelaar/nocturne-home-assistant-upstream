@@ -43,9 +43,9 @@
   },
   "stage": "experimental",
   "name": "Nocturne Stable",
-  "version": "0.2.30401",
+  "version": "0.2.40801",
   "slug": "nocturne_local",
-  "description": "Nocturne main-2efc0d6 · setup assistant",
+  "description": "Nocturne main-971dd4a · setup assistant",
   "url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream",
   "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}"
 }
