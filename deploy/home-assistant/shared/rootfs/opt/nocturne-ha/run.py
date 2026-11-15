@@ -26,6 +26,7 @@ from help_ui import make_handler as help_handler
 DATA = Path('/data')
 RUNTIME = Path('/run/nocturne')
 PG_BIN = '/usr/lib/postgresql/17/bin/'
+MAX_STARTUP_WAIT = 6 * 3600
 BASE = Path(__file__).parent
 
 
@@ -147,6 +148,31 @@ def psql(sql=None, database='postgres', stdin=None):
     if result.returncode:
         raise RuntimeError('PostgreSQL-bootstrapquery mislukt; gegevens zijn behouden')
     return result.stdout.strip()
+
+
+def database_progress():
+    """Report active database work without exposing data or credentials."""
+    try:
+        rows = psql("SELECT extract(epoch FROM now() - query_start)::int, "
+                    "coalesce(wait_event_type || '/' || wait_event, 'working'), "
+                    "cardinality(pg_blocking_pids(pid)) "
+                    "FROM pg_stat_activity WHERE datname = 'nocturne' AND state <> 'idle' "
+                    "AND backend_type = 'client backend' AND pid <> pg_backend_pid() "
+                    "ORDER BY query_start")
+        size = psql("SELECT pg_size_pretty(pg_database_size('nocturne'))")
+    except (RuntimeError, OSError, subprocess.TimeoutExpired):
+        return False, ['database status unavailable']
+    lines = [f'database {size}']
+    busy = False
+    for row in filter(None, rows.splitlines()):
+        try:
+            seconds, wait, blockers = row.split('|', 2)
+        except ValueError:
+            return False, ['database status unavailable']
+        busy = True
+        blocked = f', blocked by {blockers} connection(s)' if blockers != '0' else ''
+        lines.append(f'{seconds} s active ({wait}{blocked})')
+    return busy, lines
 
 
 def bootstrap_database(passwords):
@@ -334,14 +360,25 @@ class Supervisor:
                 self.status[name] = f'gestopt (code {process.returncode})'
                 raise RuntimeError(f'{name} is gestopt (code {process.returncode})')
 
-    def wait_for(self, name, probe, timeout=180):
-        deadline = time.monotonic() + timeout
+    def wait_for(self, name, probe, timeout=180, progress=None):
+        started = time.monotonic()
+        deadline = started + timeout
+        reported = started
         while time.monotonic() < deadline and not self.stop.is_set():
             self.check_children()
             if probe():
                 self.status[name] = 'gereed'
                 log(f'{name}: gereed')
                 return
+            if progress and time.monotonic() - reported >= 60:
+                reported = time.monotonic()
+                busy, lines = progress()
+                log(f'{name}: still starting after {int(reported - started)} seconds'
+                    + ('; database migration active' if busy else ''))
+                for line in lines:
+                    log(f'{name}: {line}')
+                if busy:
+                    deadline = max(deadline, min(reported + 120, started + MAX_STARTUP_WAIT))
             self.stop.wait(1)
         if self.stop.is_set():
             raise InterruptedError('Stop aangevraagd')
@@ -465,7 +502,8 @@ def main():
         api_env, web_env = service_environments(options, passwords, os.environ.get('TZ', 'Europe/Amsterdam'))
         supervisor.start('Nocturne API', ['dotnet', '/app/Nocturne.API.dll'],
                          user='app', env=api_env, cwd='/app')
-        supervisor.wait_for('Nocturne API', lambda: api_reachable(options['hostname']), 300)
+        supervisor.wait_for('Nocturne API', lambda: api_reachable(options['hostname']), 3600,
+                            database_progress)
         requested_native = not options['gateway_auth']
         options, gateway_issue = effective_gateway(options)
         state['gateway_issue'] = gateway_issue

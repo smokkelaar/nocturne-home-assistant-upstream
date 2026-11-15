@@ -13,6 +13,7 @@ from versions import require_upgrade
 
 BASE = Path(__file__).resolve().parents[1]
 UPSTREAM = 'nightscout/nocturne'
+BRIDGE_COMMIT = 'fe91be237ae7d2e4ea920ce67b77b4e33d50dc3b'
 ACCEPT = ', '.join(['application/vnd.oci.image.index.v1+json',
                    'application/vnd.docker.distribution.manifest.list.v2+json',
                    'application/vnd.oci.image.manifest.v1+json',
@@ -156,6 +157,7 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
     require_upgrade(version)
     source_repository = UPSTREAM
     rollout_enabled = main_rollout is not None
+    bridge = False
     if rollout_enabled:
         if not isinstance(main_rollout, dict) or not {'repository', 'commit', 'commit_at'} <= main_rollout.keys():
             raise ValueError('Main rollout requires repository, commit and commit_at')
@@ -164,6 +166,10 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             raise ValueError('Main rollout must identify official Nightscout upstream and an exact commit')
         if not isinstance(main_rollout['commit_at'], str) or datetime.fromisoformat(main_rollout['commit_at'].replace('Z', '+00:00')).tzinfo is None:
             raise ValueError('Main rollout source timestamp must include timezone')
+        bridge = 'migration_bridge' in main_rollout
+        if bridge and (main_rollout['migration_bridge'] != 'v0.3.0'
+                       or main_rollout['commit'] != BRIDGE_COMMIT):
+            raise ValueError('Migration bridge requires the exact official Nocturne v0.3.0 commit')
     release = github('releases/latest') if not rollout_enabled else None
     if release and (release['draft'] or release['prerelease'] or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', release['tag_name'])):
         raise ValueError('Stable requires a regular published release')
@@ -196,14 +202,17 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             continue
         published = previous_package(owner_repo, channel)
         require_upgrade(version, published['version'] if published else None)
-        refs = links(commit, release['tag_name'] if channel == 'stable' and not main_rollout else None,
+        refs = links(commit, 'v0.3.0' if bridge else release['tag_name'] if channel == 'stable' and not main_rollout else None,
                      owner_repo, wrapper_commit, run_id, source_repository)
-        provenance = {'channel': channel, 'commit': commit, 'upstream_tag': tag,
+        provenance = {'channel': channel, 'commit': commit,
+                      'upstream_tag': '0.3.0' if bridge else tag,
                       'upstream_run': run_id, 'recipe': recipe, 'version': version,
                       'wrapper_commit': wrapper_commit, 'repository': owner_repo,
                       'platforms': platforms, 'links': refs,
                       'baseline_image': previous.get('image') if previous else None, 'images': {}}
         provenance['source_repository'] = source_repository
+        if bridge:
+            provenance.update(migration_bridge='v0.3.0', image_tag=tag)
         request = urllib.request.Request(f'https://raw.githubusercontent.com/{source_repository}/{commit}/.github/workflows/docker-publish.yml', headers={'User-Agent': 'nocturne-ha-publisher'})
         with urllib.request.urlopen(request, timeout=30) as response:
             workflow = response.read(200_000).decode('utf-8')
@@ -225,6 +234,9 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             dockerfile = re.sub(r'ARG BUILD_ARCH=\S+', 'ARG BUILD_ARCH=' + ('aarch64' if arch == 'arm64' else arch), dockerfile)
             dockerfile = dockerfile.replace('https://github.com/smokkelaar/nocturne-home-assistant',
                                             'https://github.com/' + owner_repo)
+            if bridge:
+                dockerfile = dockerfile.replace('ENTRYPOINT ["/usr/bin/tini", "--", "python3", "/opt/nocturne-ha/run.py"]',
+                                                'ENTRYPOINT ["/usr/bin/tini", "--", "python3", "/opt/nocturne-ha/bridge_entry.py"]')
             (context / 'Dockerfile').write_text(dockerfile, encoding='utf-8')
             metadata = json.loads((context / 'rootfs/opt/nocturne-ha/version.json').read_text())
             metadata.update(app='0.2.0', package=version, nocturne=tag if channel == 'stable' and not main_rollout else 'main@' + commit[:7],
@@ -238,6 +250,12 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
                                 release_url=refs['source_url'],
                                 purpose='Use the verified official Nightscout main build without Personal changes.',
                                 purpose_url=refs['source_url'], test_url=refs['build_url'])
+            if bridge:
+                metadata.update(nocturne='0.3.0', base='Nocturne v0.3.0',
+                                release='Nocturne 0.3.0 database bridge',
+                                release_url=refs['release_url'],
+                                purpose='Run the required one-time database migration before Nocturne 0.3.1 or later.',
+                                purpose_url=refs['release_url'])
             write(context / 'rootfs/opt/nocturne-ha/version.json', metadata)
             matrix.append({'channel': channel, 'arch': arch,
                            'hass_arch': 'aarch64' if arch == 'arm64' else arch,

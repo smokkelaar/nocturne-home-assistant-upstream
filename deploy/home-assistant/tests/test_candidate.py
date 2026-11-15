@@ -171,6 +171,37 @@ class CandidateSelectionTests(unittest.TestCase):
                 self.assertEqual('NocturneStable_' if channel == 'stable' else 'NocturneMain_',
                                  runtime['cookie_namespace'])
 
+    def test_v030_bridge_uses_exact_release_source_and_preserves_storage_slots(self):
+        rollout = {'repository': 'nightscout/nocturne', 'commit': candidate.BRIDGE_COMMIT,
+                   'commit_at': '2026-10-27T09:53:08Z', 'migration_bridge': 'v0.3.0'}
+        with tempfile.TemporaryDirectory() as root:
+            output = Path(root)
+            publisher = self.select(output, [12, 13], rollout=rollout)
+            self.assertEqual([(candidate.BRIDGE_COMMIT, 'main', rollout['repository'])] * 2,
+                             [call.args for call in publisher.call_args_list])
+            for channel in ('stable', 'main'):
+                proof = json.loads((output / (channel + '.json')).read_text())
+                self.assertEqual(candidate.BRIDGE_COMMIT, proof['commit'])
+                self.assertEqual('0.3.0', proof['upstream_tag'])
+                self.assertEqual('v0.3.0', proof['migration_bridge'])
+                self.assertEqual('main-fe91be2', proof['image_tag'])
+                self.assertTrue(proof['links']['release_url'].endswith('/v0.3.0'))
+                context = output / (channel + '-amd64')
+                self.assertIn('bridge_entry.py', (context / 'Dockerfile').read_text())
+                runtime = json.loads((context / 'rootfs/opt/nocturne-ha/version.json').read_text())
+                self.assertEqual('0.3.0', runtime['nocturne'])
+                self.assertEqual('Nocturne 0.3.0 database bridge', runtime['release'])
+                self.assertEqual('NocturneStable_' if channel == 'stable' else 'NocturneMain_',
+                                 runtime['cookie_namespace'])
+
+    def test_bridge_rejects_other_source_commits_and_releases(self):
+        for release, commit in (('v0.3.0', MAIN), ('v0.3.2', candidate.BRIDGE_COMMIT)):
+            rollout = {'repository': 'nightscout/nocturne', 'commit': commit,
+                       'commit_at': '2026-10-27T09:53:08Z', 'migration_bridge': release}
+            with self.subTest(release=release, commit=commit), tempfile.TemporaryDirectory() as root, \
+                    self.assertRaises(ValueError):
+                self.select(Path(root), [], rollout=rollout)
+
     def test_main_rollout_rejects_unpinned_or_unexpected_source(self):
         for rollout in ({}, [], {'repository': 'smokkelaar/nocturne-personal', 'commit': 'main'},
                         {'repository': 'other/fork', 'commit': MAIN},

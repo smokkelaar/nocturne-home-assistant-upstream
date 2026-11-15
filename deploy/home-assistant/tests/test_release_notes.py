@@ -11,7 +11,7 @@ from publish_store import publish
 
 
 class ReleaseNotesTests(unittest.TestCase):
-    def publish_notes(self, channel):
+    def publish_notes(self, channel, bridge=False):
         source = 'a' * 40
         candidate = {'channel': channel, 'version': '0.2.2701',
                      'repository': 'example/nocturne-ha', 'commit': source,
@@ -19,6 +19,11 @@ class ReleaseNotesTests(unittest.TestCase):
                      'platforms': ['amd64', 'arm64'],
                      'links': links(source, 'v0.2.7' if channel == 'stable' else None,
                                     'example/nocturne-ha', 'b' * 40, 123)}
+        if bridge:
+            candidate['migration_bridge'] = 'v0.3.0'
+            candidate['upstream_tag'] = '0.3.0'
+            candidate['links'] = links(source, 'v0.3.0',
+                                       'example/nocturne-ha', 'b' * 40, 123)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             path = root / 'candidate.json'
@@ -44,3 +49,11 @@ class ReleaseNotesTests(unittest.TestCase):
         self.assertIn('https://github.com/nightscout/nocturne/commits/' + 'a' * 40 + '/', notes)
         self.assertNotIn('/releases/tag/', notes)
         self.assertIn('Main is a source snapshot', notes)
+
+    def test_bridge_notes_require_successful_start_before_newer_release(self):
+        for channel in ('stable', 'main'):
+            with self.subTest(channel=channel):
+                notes = self.publish_notes(channel, bridge=True)
+                self.assertIn('required Nocturne 0.3.0 database migration bridge', notes)
+                self.assertIn('successfully before installing a 0.3.1', notes)
+                self.assertIn('/releases/tag/v0.3.0', notes)
