@@ -39,13 +39,13 @@
     "private_key": "str",
     "gateway_auth": "bool",
     "skip_gateway_check": "bool",
-    "language": "list(auto|en|es|fr|de|it|pt|nl|ru|zh|ja|ko)"
+    "language": "list(auto|en|es|fr|de|it|pt|nl|ru|zh|ja|ko|cs)"
   },
   "stage": "experimental",
   "name": "Nocturne Stable",
-  "version": "0.2.40801",
+  "version": "0.2.43401",
   "slug": "nocturne_local",
-  "description": "Nocturne main-971dd4a · setup assistant",
+  "description": "Nocturne 0.3.0 · setup assistant",
   "url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream",
   "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-stable-{arch}"
 }

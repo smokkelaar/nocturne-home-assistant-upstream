@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "public_url": {
+      "name": "HTTPS adresa",
+      "description": "Použijte doménové jméno, které ovládáte. Po vytvoření účtu jej zachovejte: přístupové klíče na něm závisí."
+    },
+    "certificate": {
+      "name": "Soubor certifikátu",
+      "description": "V Konfiguraci této aplikace zadejte název souboru certifikátu fullchain.pem a soukromého klíče privkey.pem. Zadejte HTTPS doménu s portem 8448 pro Stable nebo 8449 pro Main. Pokud se liší, použijte nakonfigurovaný port hostitele. Ponechte /ssl pouze pro čtení. HTTPS jádra Home Assistant není nutné měnit."
+    },
+    "private_key": {
+      "name": "Soukromý klíč",
+      "description": "V Konfiguraci této aplikace zadejte název souboru certifikátu fullchain.pem a soukromého klíče privkey.pem. Zadejte HTTPS doménu s portem 8448 pro Stable nebo 8449 pro Main. Pokud se liší, použijte nakonfigurovaný port hostitele. Ponechte /ssl pouze pro čtení. HTTPS jádra Home Assistant není nutné měnit."
+    },
+    "gateway_auth": {
+      "name": "Další přístupový kód brány",
+      "description": "Po uložení nastavení tuto aplikaci restartujte. Otevřete HTTPS adresu v nové kartě. Prohlížeč nesmí zobrazit varování certifikátu. Dokončete nastavení účtu/přístupového klíče Nocturne a otestujte druhé zařízení."
+    },
+    "skip_gateway_check": {
+      "name": "Záměrně přeskočit kontrolu brány",
+      "description": "Pouze s gateway_auth vypnutým. Přeskočí kontrolu ověřování wrapperu pro zamýšlený anonymní přístup; nastavení přístupu/sdílení Nocturne stále rozhoduje o oprávněních. Výchozí stav je vypnuto. Uložte a restartujte."
+    },
+    "language": {
+      "name": "Jazyk",
+      "description": "Pomůžeme vám zprovoznit Nocturne krok za krokem."
+    }
+  },
+  "network": {
+    "8448/TCP": "HTTPS adresa"
+  }
+}
