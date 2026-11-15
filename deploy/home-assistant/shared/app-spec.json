@@ -38,7 +38,7 @@
     "private_key": "str",
     "gateway_auth": "bool",
     "skip_gateway_check": "bool",
-    "language": "list(auto|en|es|fr|de|it|pt|nl|ru|zh|ja|ko)"
+    "language": "list(auto|en|es|fr|de|it|pt|nl|ru|zh|ja|ko|cs)"
   },
   "stage": "experimental"
 }

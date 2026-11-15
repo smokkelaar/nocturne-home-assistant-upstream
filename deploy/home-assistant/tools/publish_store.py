@@ -58,9 +58,14 @@ def publish(candidate, destination):
     change_link = provenance['links']['release_url']
     changes = (f'[Nocturne release notes]({change_link})' if change_link else
                f'Main is a source snapshot. [Nocturne commit history](https://github.com/{provenance.get("source_repository", "nightscout/nocturne")}/commits/{provenance["commit"]}/)')
+    bridge_note = ('This is the required Nocturne 0.3.0 database migration bridge. Install and start '
+                   'this package successfully before installing a 0.3.1 or newer package. '
+                   'The existing add-on identity and private data directory are retained.\n\n'
+                   if provenance.get('migration_bridge') == 'v0.3.0' else '')
     (folder / 'CHANGELOG.md').write_text(
         f'# Nocturne {channel.title()} — HA package {version}\n\n'
         f'Nocturne version/source: `{provenance["upstream_tag"]}`.\n\n'
+        + bridge_note +
         f'Published architectures: {", ".join(digests)}. Both use the same Nocturne source.\n\n'
         f'{changes}\n\n'
         f'- [Exact Nocturne source]({provenance["links"]["source_url"]})\n'

@@ -110,7 +110,7 @@ remain in the [acceptance checklist](docs/ACCEPTANCE.md).
 
 ## Official main rollout
 
-The deployment pins both existing Stable and Main storage slots to the verified official `nightscout/nocturne` main image pair in `deploy/home-assistant/main-rollout.json`, without Personal changes or an extra treatment patch. The Stable slot runs that same main snapshot during this rollout. Ports, data identities and cookie namespaces remain separate; runtime metadata and published provenance identify the exact source.
+The deployment pins both existing Stable and Main storage slots to the exact official `nightscout/nocturne` v0.3.0 source commit in `deploy/home-assistant/main-rollout.json`. This is the required one-time database migration bridge for installations created before Nocturne 0.3.0. Install and successfully start this package before any 0.3.1 or newer update. The source is shared, while ports, add-on slugs, private data and cookie namespaces remain separate. The tested images use the official main publication for that same release commit; provenance records both the release and image tag. Personal source changes are excluded.
 
 ## Install
 

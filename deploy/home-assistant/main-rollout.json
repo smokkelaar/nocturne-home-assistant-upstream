@@ -1,5 +1,6 @@
 {
-  "commit": "971dd4a78e2aa89a64f910719bb3bf0ca079b1cd",
-  "commit_at": "2026-10-23T05:10:14Z",
-  "repository": "nightscout/nocturne"
+  "commit": "fe91be237ae7d2e4ea920ce67b77b4e33d50dc3b",
+  "commit_at": "2026-10-27T09:53:08Z",
+  "repository": "nightscout/nocturne",
+  "migration_bridge": "v0.3.0"
 }
