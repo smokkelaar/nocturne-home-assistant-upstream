@@ -202,6 +202,33 @@ class CandidateSelectionTests(unittest.TestCase):
                     self.assertRaises(ValueError):
                 self.select(Path(root), [], rollout=rollout)
 
+    def test_v032_release_uses_exact_source_for_both_existing_storage_slots(self):
+        rollout = {'repository': 'nightscout/nocturne', 'commit': candidate.RELEASE_032_COMMIT,
+                   'commit_at': '2026-11-15T01:21:28Z', 'release': 'v0.3.2'}
+        with tempfile.TemporaryDirectory() as root:
+            output = Path(root)
+            self.select(output, [12, 13], rollout=rollout)
+            for channel in ('stable', 'main'):
+                proof = json.loads((output / (channel + '.json')).read_text())
+                self.assertEqual(candidate.RELEASE_032_COMMIT, proof['commit'])
+                self.assertEqual('0.3.2', proof['upstream_tag'])
+                self.assertEqual('main-ea4e97c', proof['image_tag'])
+                self.assertTrue(proof['links']['release_url'].endswith('/v0.3.2'))
+                context = output / (channel + '-amd64')
+                self.assertIn('bridge_entry.py', (context / 'Dockerfile').read_text())
+                runtime = json.loads((context / 'rootfs/opt/nocturne-ha/version.json').read_text())
+                self.assertEqual('0.3.2', runtime['nocturne'])
+                self.assertEqual('NocturneStable_' if channel == 'stable' else 'NocturneMain_',
+                                 runtime['cookie_namespace'])
+
+    def test_v032_release_rejects_other_source_and_tag(self):
+        for release, commit in (('v0.3.1', candidate.RELEASE_032_COMMIT), ('v0.3.2', MAIN)):
+            rollout = {'repository': 'nightscout/nocturne', 'commit': commit,
+                       'commit_at': '2026-11-15T01:21:28Z', 'release': release}
+            with self.subTest(release=release, commit=commit), tempfile.TemporaryDirectory() as root, \
+                    self.assertRaises(ValueError):
+                self.select(Path(root), [], rollout=rollout)
+
     def test_main_rollout_rejects_unpinned_or_unexpected_source(self):
         for rollout in ({}, [], {'repository': 'smokkelaar/nocturne-personal', 'commit': 'main'},
                         {'repository': 'other/fork', 'commit': MAIN},
