@@ -244,9 +244,9 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
             dockerfile = re.sub(r'ARG BUILD_ARCH=\S+', 'ARG BUILD_ARCH=' + ('aarch64' if arch == 'arm64' else arch), dockerfile)
             dockerfile = dockerfile.replace('https://github.com/smokkelaar/nocturne-home-assistant',
                                             'https://github.com/' + owner_repo)
-            if bridge or release_tag:
-                dockerfile = dockerfile.replace('ENTRYPOINT ["/usr/bin/tini", "--", "python3", "/opt/nocturne-ha/run.py"]',
-                                                'ENTRYPOINT ["/usr/bin/tini", "--", "python3", "/opt/nocturne-ha/bridge_entry.py"]')
+            # Every source from the 0.3.0 bridge on keeps the volume-ownership check in front of run.py.
+            dockerfile = dockerfile.replace('ENTRYPOINT ["/usr/bin/tini", "--", "python3", "/opt/nocturne-ha/run.py"]',
+                                            'ENTRYPOINT ["/usr/bin/tini", "--", "python3", "/opt/nocturne-ha/bridge_entry.py"]')
             (context / 'Dockerfile').write_text(dockerfile, encoding='utf-8')
             metadata = json.loads((context / 'rootfs/opt/nocturne-ha/version.json').read_text())
             metadata.update(app='0.2.0', package=version, nocturne=tag if channel == 'stable' and not main_rollout else 'main@' + commit[:7],

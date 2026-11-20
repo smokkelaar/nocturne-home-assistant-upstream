@@ -108,9 +108,16 @@ a security audit. The actual rating and protection/AppArmor state are shown by
 Supervisor and can depend on local settings. Real HAOS and live-provider checks
 remain in the [acceptance checklist](docs/ACCEPTANCE.md).
 
-## Official main rollout
+## Sources
 
-The deployment pins both existing Stable and Main storage slots to the exact official `nightscout/nocturne` v0.3.2 source commit in `deploy/home-assistant/main-rollout.json`. Install and successfully start the previously published v0.3.0 migration bridge before this release. The source is shared, while ports, add-on slugs, private data and cookie namespaces remain separate. The tested images use the official main publication for the v0.3.2 release commit; provenance records both the release and image tag. Personal source changes are excluded.
+Stable follows the newest regular official `nightscout/nocturne` release (now v0.3.2) and
+Main follows the newest `main` commit whose official API/web images were published
+successfully; the daily run picks both up. Both channels need the previously published
+v0.3.0 migration bridge to have been installed and started once. Ports, add-on slugs, private
+data and cookie namespaces remain separate. Personal source changes are excluded.
+
+To pin both slots to one exact commit again, add `deploy/home-assistant/main-rollout.json`
+(`repository`, `commit`, `commit_at`); the workflow uses it whenever the file exists.
 
 ## Install
 
