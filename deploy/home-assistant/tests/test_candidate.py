@@ -147,6 +147,20 @@ class CandidateSelectionTests(unittest.TestCase):
             matrix = json.loads((Path(root) / 'matrix.json').read_text())
             self.assertEqual([item['channel'] for item in matrix['include']], ['stable', 'main'])
 
+    def test_unpinned_sources_describe_the_release_and_main_and_keep_the_bridge_entry(self):
+        with tempfile.TemporaryDirectory() as root:
+            output = Path(root)
+            self.select(output, [12, 13])
+            stable = json.loads((output / 'stable-amd64/rootfs/opt/nocturne-ha/version.json').read_text())
+            main = json.loads((output / 'main-amd64/rootfs/opt/nocturne-ha/version.json').read_text())
+            self.assertEqual(('0.2.4', 'Nocturne v0.2.4', '0.2.4'), (stable['nocturne'], stable['base'], stable['release']))
+            self.assertEqual('https://github.com/nightscout/nocturne/releases/tag/v0.2.4', stable['release_url'])
+            self.assertEqual(('main@' + MAIN[:7], 'Nocturne main', 'Official main ' + MAIN[:7]),
+                             (main['nocturne'], main['base'], main['release']))
+            self.assertEqual('https://github.com/nightscout/nocturne/tree/' + MAIN, main['release_url'])
+            for channel in ('stable', 'main'):
+                self.assertIn('bridge_entry.py', (output / f'{channel}-amd64/Dockerfile').read_text())
+
     def test_pinned_main_rollout_uses_verified_official_images_in_both_storage_slots(self):
         rollout = {'repository': 'nightscout/nocturne', 'commit': MAIN, 'commit_at': '2026-10-14T11:40:00Z'}
         with tempfile.TemporaryDirectory() as root:

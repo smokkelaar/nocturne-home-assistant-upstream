@@ -260,6 +260,16 @@ def select(destination, owner_repo, version, wrapper_commit, platforms, force=Fa
                                 release_url=refs['source_url'],
                                 purpose='Use the verified official Nightscout main build without Personal changes.',
                                 purpose_url=refs['source_url'], test_url=refs['build_url'])
+            elif channel == 'stable':
+                metadata.update(nocturne=tag, base='Nocturne v' + tag, release=tag,
+                                release_url=refs['release_url'],
+                                purpose='Use the newest official Nocturne release.',
+                                purpose_url=refs['release_url'], test_url=refs['build_url'])
+            else:
+                metadata.update(base='Nocturne main', release='Official main ' + commit[:7],
+                                release_url=refs['source_url'],
+                                purpose='Follow the newest official Nightscout main build without Personal changes.',
+                                purpose_url=refs['source_url'], test_url=refs['build_url'])
             if bridge:
                 metadata.update(nocturne='0.3.0', base='Nocturne v0.3.0',
                                 release='Nocturne 0.3.0 database bridge',
