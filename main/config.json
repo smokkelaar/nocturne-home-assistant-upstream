@@ -43,9 +43,9 @@
   },
   "stage": "experimental",
   "name": "Nocturne Main",
-  "version": "0.2.45501",
+  "version": "0.2.45601",
   "slug": "nocturne_latest",
-  "description": "Nocturne main-1293716 · setup assistant",
+  "description": "Nocturne main-0160c0d · setup assistant",
   "url": "https://github.com/smokkelaar/nocturne-home-assistant-upstream",
   "image": "ghcr.io/smokkelaar/nocturne-home-assistant-upstream/nocturne-main-{arch}"
 }
